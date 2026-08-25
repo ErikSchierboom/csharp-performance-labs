@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- Less noise while profiling: no background GC thread, workstation GC.
+         Later levels change these on purpose. -->
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <Deterministic>true</Deterministic>
+    <!-- The EF Core SQLite exercises use only in-memory databases inside the process; the SQLitePCLRaw audit warning doesn't apply to a learning lab. -->
+    <NoWarn>$(NoWarn);NU1903</NoWarn>
+    <!-- Keep PDBs so the profiler can show source lines. -->
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+</Project>

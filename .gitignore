@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+.idea/
+*.user
+*.dtp
+*.dmw
+*.nettrace
+*.gcdump
+site/
+.venv-docs/
