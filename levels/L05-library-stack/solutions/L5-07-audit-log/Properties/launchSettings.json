@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Measure": {
+      "commandName": "Project"
+    },
+    "Profile": {
+      "commandName": "Project",
+      "commandLineArgs": "--profile --seconds 15"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\PerfLab.Harness\PerfLab.Harness.csproj" />
+    <!-- Same Program.cs (checksum + budgets) as the exercise: one source of truth. -->
+    <Compile Include="..\..\exercises\L7-03-works-on-my-laptop\Program.cs" Link="Program.cs" />
+    <RuntimeHostConfigurationOption Include="System.GC.DynamicAdaptationMode" Value="0" />   <!-- pasted from a tuning guide -->
+    <RuntimeHostConfigurationOption Include="System.GC.HeapCount" Value="4" />
+  </ItemGroup>
+</Project>

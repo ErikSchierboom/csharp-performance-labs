@@ -1,0 +1,78 @@
+site_name: C# Performance Lab
+site_description: ".NET performance, basics to mastery"
+site_url: https://pvorselaars.github.io/csharp-performance-labs/
+repo_url: https://github.com/pvorselaars/csharp-performance-labs
+repo_name: pvorselaars/csharp-performance-labs
+edit_uri: edit/staging/
+
+docs_dir: ..
+site_dir: ../../perflab-site
+
+theme:
+  name: material
+  icon:
+    logo: material/rocket-launch
+  favicon: material/rocket-launch
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.path
+    - toc.follow
+    - search.suggest
+    - content.code.copy
+
+plugins:
+  - search
+  # Lets a folder's .pages file override MkDocs' default alphabetical nav order,
+  # used where alphabetical order would spoil something, e.g. ANSWERS.md sorting
+  # before QUESTIONS.md in the Level 8 labs.
+  - awesome-pages
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - tables
+  - fenced_code
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+# This is a code repo, not a docs/ folder: docs_dir is the repo root so every
+# README.md, HINTS.md and SOLUTION.md is picked up in place and relative links
+# between them keep working unchanged. Everything that isn't reading material
+# is excluded below. If you add a new top-level folder that shouldn't be
+# published (another source dir, another tool config), add it here too.
+# MkDocs excludes a root-level /templates/ folder by default (it's the
+# conventional Jinja2 theme-override directory); un-exclude ours, which is
+# just our LAB-LOG.md/POSTMORTEM.md fill-in templates, not a theme override.
+exclude_docs: |
+  !/templates/
+  .git/**
+  .github/**
+  .claude/**
+  .mkdocs/**
+  .vs/**
+  .idea/**
+  bin/**
+  obj/**
+  **/bin/**
+  **/obj/**
+  src/**
+  ci/**
+  requirements-docs.txt
+  *.slnx
+  *.props
+  *.user

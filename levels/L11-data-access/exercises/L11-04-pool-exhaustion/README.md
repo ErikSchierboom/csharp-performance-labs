@@ -1,0 +1,19 @@
+# L11 · Connection held across a slow call
+
+## Symptom
+The database is nowhere near busy (each query is 1 ms) but under 64 users **requests queue for a connection**, throughput plateaus around 250 requests/second and p99 is huge. In production the same shape shows up as `Timeout expired... all pooled connections were in use`. Threads and CPU are idle.
+
+## Goal
+Same result (checksum), and:
+
+| Budget | Value |
+|---|---|
+| Median time | 1330 ref-ms |
+| Median allocated | 6 MB |
+| Median p99 latency | 161 ref-ms |
+
+## Note (the ASP.NET Core levels (9–14) harness)
+The exercise runs an ASP.NET Core server on loopback **inside the harness process** (`WebRig`) and drives it with virtual users. Databases are in-memory SQLite, seeded once. Allocation and CPU include the small constant client cost.
+
+## Extra credit
+Compute the throughput ceiling for pool size 8, hold 31 ms; then for hold 1 ms. Compare with what the harness measures.
