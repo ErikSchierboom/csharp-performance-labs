@@ -1,4 +1,4 @@
-# Answers (measured)
+# Answers
 
 1. **Self time:** almost entirely in the hashing loop (`Hash`, the leaf under `Compress`). **Inclusive:** `Compress` dominates the `service!` frames.
 2. **Path:** `Main -> HandleRequest -> Render -> Template -> Layout -> Widgets -> Serialize -> Compress -> Hash`.

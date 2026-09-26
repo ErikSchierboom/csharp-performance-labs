@@ -1,4 +1,4 @@
-# Basics to mastery
+# C# Performance Labs
 
 You know the moment: some perfectly reasonable-looking code is quietly eating a gigabyte of RAM, or takes over 400ms, and you have no idea why yet. C# Performance Lab exists to give you that moment on purpose, somewhere safe: a profiler, a stopwatch, and nobody paging you at 3 a.m.
 
