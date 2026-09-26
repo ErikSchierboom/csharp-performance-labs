@@ -1,9 +1,9 @@
 // Mystery service for Lab L08-01. Don't read this until you've classified all five scenarios from the outside.
 using System.Diagnostics;
 
-string scenario = args.Length > 1 && args[0] == "--scenario" ? args[1] : "healthy";
-int seconds = args.Contains("--seconds") ? int.Parse(args[Array.IndexOf(args, "--seconds") + 1]) : 600;
-Console.WriteLine($"service pid={Environment.ProcessId} scenario=<hidden> running for up to {seconds}s (Ctrl-C to stop)");
+var scenario = args.Length > 1 && args[0] == "--scenario" ? args[1] : "healthy";
+var seconds = args.Contains("--seconds") ? int.Parse(args[Array.IndexOf(args, "--seconds") + 1]) : 600;
+Console.WriteLine($"service pid={Environment.ProcessId} scenario={scenario}, running for up to {seconds}s (Ctrl-C to stop)");
 var until = Stopwatch.GetTimestamp() + seconds * Stopwatch.Frequency;
 bool Running() => Stopwatch.GetTimestamp() < until;
 
@@ -16,10 +16,13 @@ switch (scenario)
     default: Idle(); break;
 }
 
+return;
+
 void Busy()   // a
 {
     var threads = Enumerable.Range(0, 4).Select(_ => new Thread(() => { double x = 1; while (Running()) for (int i = 0; i < 100_000; i++) x = Math.Sqrt(x + i); GC.KeepAlive(x); })).ToList();
-    threads.ForEach(t => t.Start()); threads.ForEach(t => t.Join());
+    threads.ForEach(t => t.Start());
+    threads.ForEach(t => t.Join());
 }
 
 void Churn()  // b

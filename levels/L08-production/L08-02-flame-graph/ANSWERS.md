@@ -1,15 +1,10 @@
 # Answers (measured)
 
-> From a real `dotnet-trace --format Speedscope` capture (8 s) of this service on a 20-core Linux box, .NET 10 runtime, methods marked non-inlinable so they appear as distinct frames. I summed the trace's event durations by stack.
-
-1. **Self time:** almost entirely in the hashing loop (`Hash`, called from many places: the leaf). **Inclusive:** `Compress` dominates the `service!` frames.
-2. **Path:** `Main → HandleRequest → Render → Template → Layout → Widgets → Serialize → Compress → Hash`.
-3. `Compress` accounts for about **99% of the time spent inside `HandleRequest`** in my capture (≈ 47.5% of all trace time vs `HandleRequest` ≈ 47.9%; the other half of the trace time was runtime/GC-poll frames, which you can ignore).
-4. It is reached only on every 5th request (`Render` takes the `Template` branch when `i % 5 == 0`) and it is called four times per such request. The *expensive minority* dominates: that's why an average per-request view (or reading the code top-down) hides it. **Counts** (tracing mode) would show `Compress` is called rarely; **time** (sampling) shows it's where the CPU is: the combination is the diagnosis.
-5. `Authenticate`, `Route`, `Lookup`, `Normalize` are called on every request but are tiny (hundreds of loop rounds versus 12,000 in `Compress`). They are wide in *call count* but thin in *time*. In a flame graph, **width = time**, so they're slivers.
+1. **Self time:** almost entirely in the hashing loop (`Hash`, the leaf under `Compress`). **Inclusive:** `Compress` dominates the `service!` frames.
+2. **Path:** `Main -> HandleRequest -> Render -> Template -> Layout -> Widgets -> Serialize -> Compress -> Hash`.
+3. `Compress` accounts for about **99% of the time spent inside `HandleRequest`** (45.6% of `HandleRequest`'s 46.2% in one capture). The rest of the trace time is runtime/GC-poll frames, which you can ignore.
+4. Look at the **expensive minority**, not the average request. The graph gives you *time* only: `Compress` is ~99% of `HandleRequest`, and it sits at the bottom of a deep, single-branch path (`Render -> Template -> Layout -> Widgets -> Serialize`), so whatever calls it is not the common case. A sampling profile cannot give you *call counts*. To prove "rare but expensive" you need both numbers: **time share** (inclusive % from the sampling trace) and **call count** (from an instrumented or tracing profile, or a counter you add). Few calls with a huge time share means the cost is *per call*, so that's where to optimise.
+5. The cheap helpers (`Authenticate`, `Route`, `Lookup`, `Normalize`) **don't appear in the trace at all**: in these captures the only `service!` frames are `Main`, `HandleRequest`, `Render`, `Template`, `Layout`, `Widgets`, `Serialize`, `Compress` and `Hash`. That absence is the answer: they take so little time that the sampler catches almost none of it. In a flame graph **width = time**, so a function you can't see is one you can ignore. (Even `Serialize` and `Layout` only get ~0.2–0.3% each from their own `Hash` calls.)
 
 ## What you'd do next
-Optimise or cache `Compress` (it's the only code worth touching), or avoid calling it (compress once, not four times per request). Then re-profile: the graph will change shape.
-
-## Reveal
-`Compress` = `Hash(i, 12_000)`; everything else is 100–200 rounds.
+Optimise or cache `Compress` (it's the only code worth touching), or call it less often (the fan-out `Template -> Layout -> Widgets -> Serialize` above it multiplies the calls; the trace's path shows where that happens, and a call-count profile would tell you how many). Then re-profile: the graph will change shape.

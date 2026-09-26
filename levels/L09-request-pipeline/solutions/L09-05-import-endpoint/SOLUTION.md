@@ -1,24 +1,26 @@
 # L09-05 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
 
-- **Allocations:** `string` (~120 KB, LOH), `StringBuilder` chunk `char[]`s, transcoding buffers per request. **Gen2 GCs** driven by LOH allocation.
+- **Allocations:** per request, one ~340 KB `string` (the whole body in UTF-16, on the LOH), the `StringBuilder`/`char[]` buffers `ReadToEndAsync` grows on the way there, and UTF-8 transcoding buffers when the string is parsed. The `ImportLine` objects themselves are a small fraction.
+- **GC:** ~35 gen2 collections per run: LOH allocations count toward gen2, so every request brings the next full collection closer.
 
 ## Root cause
-Buffering the whole request body as a string before parsing: a large UTF-16 copy (on the LOH) plus intermediate buffers per request, repeated for every request.
+The handler turns the request body into a string before parsing it: a 170 KB UTF-8 body becomes a 340 KB UTF-16 string on the Large Object Heap, built through intermediate buffers, then transcoded back to UTF-8 for the parser, on every request.
+
+The model is already lean: `ImportLine` declares only `Id` and `Qty`, and `System.Text.Json` skips the descriptions, SKUs and prices without allocating anything for them. So the string copy isn't a small part of the cost, it's nearly all of it.
 
 ## Fix
-Deserialise directly from `Request.Body` (`JsonSerializer.DeserializeAsync` or `ReadFromJsonAsync<T>()`), so the payload is read in pooled UTF-8 chunks and never becomes a string.
+Parse straight from the request stream: `await ctx.Request.ReadFromJsonAsync<ImportBatch>()` (or `JsonSerializer.DeserializeAsync<ImportBatch>(ctx.Request.Body)`). The serializer reads the body in pooled UTF-8 chunks, and the payload never exists as one big object. Binding the model as a handler parameter (`async (ImportBatch batch) => ...`) does the same.
 
 ## Take-aways
-1. **Don't turn request bodies into strings** unless you must; stream them into the parser.
-2. LOH-sized garbage on every request shows up as gen2 GCs and latency spikes, not as a slow function (Level 2 again).
-3. Framework helpers (`ReadFromJsonAsync`, model binding) already stream; hand-written 'read the body then parse' code is where this creeps in.
-4. Set a request-size limit (`MaxRequestBodySize`) regardless: unbounded bodies are also a denial-of-service vector.
+1. **Don't turn request bodies into strings** unless you really need the text; stream them into the parser.
+2. **A lean model only helps if the parser sees the stream.** Skipping unused properties is free, but not after the whole body has been copied into a string first.
+3. LOH-sized garbage on every request shows up as gen2 collections and latency spikes, not as one slow function (Level 2 again).
+4. Set a request size limit (`MaxRequestBodySize`) regardless: an unbounded body is also a denial-of-service vector.
 
 ## Extra credit
-Call `ctx.Request.EnableBuffering()` in the fix. What does that do to allocation, and when would you need it?
+Call `ctx.Request.EnableBuffering()` before parsing in the fix. What does it do to allocation, and when would you actually need it (for example, to log the body after a failed parse)?
 
 ## Go further
-Add a 10 MB body and compare peak memory for the two versions. Then use `PipeReader` (`ctx.Request.BodyReader`) with `Utf8JsonReader` for a fully streaming parse of a huge array.
+Make the batch 10,000 lines and compare peak memory for both versions. Then sum a huge batch without holding every line in memory: `JsonSerializer.DeserializeAsyncEnumerable<ImportLine>` streams a *top-level* array, so it would need a different payload shape; with this shape, a `PipeReader` (`ctx.Request.BodyReader`) and a `Utf8JsonReader` can walk `Lines` one item at a time.

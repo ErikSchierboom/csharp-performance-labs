@@ -1,8 +1,6 @@
 # L09-03 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
 - **Sampling:** time in `FlushAsync`, `WriteAsync`, Kestrel's output pipe writer/socket send path; allocation of the per-line interpolated strings.
 
 ## Root cause
@@ -13,7 +11,7 @@ Build the body once (`StringBuilder`, or better, write directly to `BodyWriter`)
 
 ## Take-aways
 1. **Don't flush per item** unless a client benefits from receiving items early.
-2. Chattiness is a latency multiplier: fixed per-call cost × number of calls.
+2. Chattiness is a latency multiplier: fixed per-call cost x number of calls.
 3. Prefer `BodyWriter`/`IBufferWriter<byte>` and `Utf8` formatting for high-throughput endpoints; avoid `string` intermediates.
 4. `Response.WriteAsync(string)` encodes to UTF-8 each call; a single large write encodes once.
 

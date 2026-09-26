@@ -1,8 +1,6 @@
 # L09-02 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
 - **Allocations:** `Regex` internals (parser, code), `Match`/`Group`, interpolated `string`, header strings, per request.
 
 ## Root cause

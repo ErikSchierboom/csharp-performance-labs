@@ -72,6 +72,25 @@
     <Project Path="levels/L07-boss-fights/solutions/L07-03-works-on-my-laptop/L07-03-works-on-my-laptop.csproj" />
     <Project Path="levels/L07-boss-fights/solutions/L07-04-whodunit/L07-04-whodunit.csproj" />
   </Folder>
+  <Folder Name="/L08-production/" />
+  <Folder Name="/L08-production/L08-01-triage/">
+    <File Path="levels\L08-production\L08-01-triage\ANSWERS.md" />
+    <Project Path="levels/L08-production/L08-01-triage/src/triage.csproj" />
+  </Folder>
+  <Folder Name="/L08-production/L08-02-flame-graph/">
+    <File Path="levels\L08-production\L08-02-flame-graph\ANSWERS.md" />
+    <Project Path="levels/L08-production/L08-02-flame-graph/src/flame-graph.csproj" />
+  </Folder>
+  <Folder Name="/L08-production/L08-03-who-holds-memory/">
+    <File Path="levels\L08-production\L08-03-who-holds-memory\ANSWERS.md" />
+    <Project Path="levels/L08-production/L08-03-who-holds-memory/src/who-holds-memory.csproj" />
+  </Folder>
+  <Folder Name="/L08-production/L08-04-container-limits/">
+    <File Path="levels\L08-production\L08-04-container-limits\ANSWERS.md" />
+  </Folder>
+  <Folder Name="/L08-production/L08-05-perf-gate/">
+    <File Path="levels\L08-production\L08-05-perf-gate\ANSWERS.md" />
+  </Folder>
   <Folder Name="/L09-request-pipeline/">
     <Project Path="levels/L09-request-pipeline/solutions/L09-01-hello-endpoint/L09-01-hello-endpoint.csproj" />
     <Project Path="levels/L09-request-pipeline/solutions/L09-02-audit-middleware/L09-02-audit-middleware.csproj" />

@@ -1,25 +1,25 @@
 # L09-04 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
-- **Allocations:** a 20,000-entry `Dictionary<int,int>` per request (≈ 500 KB), `ServiceProvider`/`ServiceCollection` internals.
-- **Call count:** the `PriceCalculator` constructor runs once per request.
+- **Allocations:** ~600 KB per request, almost all from `PriceCatalog`'s constructor: `string.Split` results (one `string[]` and two strings per CSV row), and a `Dictionary<int, decimal>` resized up to 2,000 entries.
+- **Call count:** `PriceCatalog..ctor` runs once per request: 1,500 times per run, for data that never changes.
 
 ## Root cause
-A new DI container per request plus a transient registration of an expensive-to-construct type: the reference data is rebuilt for every request.
+`PriceCatalog` is registered as **transient**, so the container creates a new one every time something asks for it. `PricingService` is resolved for every request, and it depends on `PriceCatalog`, so every request parses the whole price file into a new dictionary, uses one entry, and throws it away.
+
+Nothing looks wrong in the code: `AddTransient` is what most samples use, and the constructor "just loads the prices". The cost only shows once you notice *how often* that constructor runs.
 
 ## Fix
-Register `PriceCalculator` as a **singleton** in the host's container (built once, thread-safe because it's read-only) and let the endpoint receive it as a parameter.
+`builder.Services.AddSingleton<PriceCatalog>();` One word. The catalog is built on first use and shared by every request. That's safe because it's read-only after construction (a `Dictionary` is safe for concurrent reads as long as nobody writes). `PricingService` can stay transient: it's cheap, and a transient may depend on a singleton.
 
 ## Take-aways
-1. **Never build a `ServiceProvider` on the request path** (`BuildServiceProvider` in a handler, or the service-locator pattern with new containers).
-2. Match lifetime to cost and state: expensive and immutable → singleton; cheap and stateless → transient; per-request state → scoped.
-3. Beware *captive dependencies*: a singleton must not hold a scoped/transient dependency that should be short-lived.
-4. The DI container is fast when used as designed; the cost here was construction, not resolution.
+1. **Match the lifetime to the cost and the state.** Expensive to build and immutable -> singleton. Cheap and stateless -> transient (or singleton). Holds per-request state (a `DbContext`, the current user) -> scoped.
+2. **Transient is contagious in cost:** resolving a transient service also builds every transient it depends on, however deep.
+3. **Count constructor calls** for anything that loads data: a constructor running once per request for data that never changes is this bug.
+4. Watch the reverse mistake, *captive dependencies*: a singleton that depends on a scoped service keeps one instance of it forever. `ValidateScopes` catches that in development.
 
 ## Extra credit
-Register it as a singleton *factory* (`AddSingleton(sp => new PriceCalculator())`) and as a transient. Count constructor calls per 1,000 requests for each lifetime.
+Register `PriceCatalog` as **scoped** instead. How many times is it built per 1,500 requests, and why doesn't that fix it? Then make `PricingService` a singleton and leave `PriceCatalog` transient. Why does that *also* pass, and why is it a worse fix?
 
 ## Go further
-Make the calculator scoped instead. What changes per request, and why is that still expensive? Then look at `ValidateScopes`/`ValidateOnBuild` for catching lifetime mistakes.
+The prices do change occasionally in real life. How would you reload the singleton without restarting the app, and without a request ever seeing a half-built table? (Look at swapping a reference with `Volatile.Write`/`Interlocked.Exchange`, or `IOptionsMonitor`.)

@@ -13,6 +13,6 @@ The same service (150 MB of live data plus a stream of short-lived garbage) is r
 The service prints its GC counts, heap size and **the memory limit the GC believes it has** every 2 s, and total work done ("allocations") at the end (a throughput proxy).
 Fill in [QUESTIONS.md](QUESTIONS.md), then compare with [ANSWERS.md](ANSWERS.md).
 
-**Platform note:** the memory limit itself is a real Linux cgroups feature (via `systemd-run`), not something any script can emulate; only `run.ps1 none` (unlimited) runs natively on Windows/macOS. Do the limited runs under WSL2, a Linux VM, or a Linux CI runner.
+**Requirements:** Docker or Podman (Docker Desktop on Windows/macOS). The script builds a small Linux image from [Dockerfile](Dockerfile) on first run (the .NET SDK/runtime images are pulled once) and applies the limit with `--memory` (plus `--memory-swap` equal to it, so no swap), which is a cgroup limit exactly like in Kubernetes. It works identically on Windows, macOS and Linux; `none` runs the same container without a limit. No prior `build-all.ps1` is needed for this lab.
 
-Podman/Docker work too: `podman run --memory=220m ...` with a container image of the published output (not provided here).
+Manual equivalent: `docker build -t perflab-l08-04 .` then `docker run --rm --memory=220m --memory-swap=220m -e DOTNET_GCConserveMemory=9 perflab-l08-04`.

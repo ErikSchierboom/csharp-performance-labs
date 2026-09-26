@@ -72,6 +72,35 @@
     <Project Path="levels/L07-boss-fights/exercises/L07-03-works-on-my-laptop/L07-03-works-on-my-laptop.csproj" />
     <Project Path="levels/L07-boss-fights/exercises/L07-04-whodunit/L07-04-whodunit.csproj" />
   </Folder>
+  <Folder Name="/L08-production/">
+    <File Path="levels\L08-production\README.md" />
+    <File Path="levels\L08-production\build-all.ps1" />
+  </Folder>
+  <Folder Name="/L08-production/L08-01-triage/">
+    <File Path="levels\L08-production\L08-01-triage\README.md" />
+    <File Path="levels\L08-production\L08-01-triage\QUESTIONS.md" />
+    <File Path="levels\L08-production\L08-01-triage\run.ps1" />
+  </Folder>
+  <Folder Name="/L08-production/L08-02-flame-graph/">
+    <File Path="levels\L08-production\L08-02-flame-graph\README.md" />
+    <File Path="levels\L08-production\L08-02-flame-graph\QUESTIONS.md" />
+    <File Path="levels\L08-production\L08-02-flame-graph\run.ps1" />
+  </Folder>
+  <Folder Name="/L08-production/L08-03-who-holds-memory/">
+    <File Path="levels\L08-production\L08-03-who-holds-memory\README.md" />
+    <File Path="levels\L08-production\L08-03-who-holds-memory\QUESTIONS.md" />
+    <File Path="levels\L08-production\L08-03-who-holds-memory\run.ps1" />
+  </Folder>
+  <Folder Name="/L08-production/L08-04-container-limits/">
+    <File Path="levels\L08-production\L08-04-container-limits\README.md" />
+    <File Path="levels\L08-production\L08-04-container-limits\QUESTIONS.md" />
+    <File Path="levels\L08-production\L08-04-container-limits\run.ps1" />
+  </Folder>
+  <Folder Name="/L08-production/L08-05-perf-gate/">
+    <File Path="levels\L08-production\L08-05-perf-gate\README.md" />
+    <File Path="levels\L08-production\L08-05-perf-gate\QUESTIONS.md" />
+    <File Path="scripts\perf-gate.ps1" />
+  </Folder>
   <Folder Name="/L09-request-pipeline/">
     <Project Path="levels/L09-request-pipeline/exercises/L09-01-hello-endpoint/L09-01-hello-endpoint.csproj" />
     <Project Path="levels/L09-request-pipeline/exercises/L09-02-audit-middleware/L09-02-audit-middleware.csproj" />

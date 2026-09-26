@@ -1,6 +1,4 @@
-# Answers (measured)
-
-> Measured with `systemd-run --user --scope -p MemoryMax=… -p MemorySwapMax=0` on a 20-core Linux box, .NET 10, workstation non-concurrent GC, live set 150 MB, 6–8 s runs. "Allocations" = total short-lived buffers allocated in the run (throughput proxy). Yours will differ in absolute terms.
+# Answers
 
 | Limit / setting | Result | `limit=` seen | Allocations (6 s run) |
 |---|---|---|---|
@@ -19,7 +17,4 @@
 5. For a 256 MB limit and a 150 MB live set: raise the *headroom for the GC* (explicit heap limit around 75–80% of the limit or `GCHeapHardLimitPercent`), reduce the working set (pooling, smaller buffers, workstation GC), or raise the container limit. Confirm with the same load test at the target limit: throughput, `gc-heap-size`, GC pause time, and no OOM over hours.
 
 ## The lesson
-A memory limit isn't a cliff you either fit under or don't: as you approach it the GC gets busier long before anything fails. Test **at** the limit, not just below it.
-
-## Reveal
-The service keeps 150 × 1 MB arrays alive and allocates 64 KB short-lived arrays on 4 threads as fast as it can.
+A memory limit isn't a limit you either fit under or don't: as you approach it the GC gets busier long before anything fails. Test **at** the limit, not just below it.

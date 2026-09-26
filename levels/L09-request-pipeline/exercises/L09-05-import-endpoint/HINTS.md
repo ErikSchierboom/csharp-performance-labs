@@ -12,5 +12,5 @@ Follow the bytes: request stream → ? → `Batch`. Count how many full copies o
 
 <details><summary>Hint 3: why?</summary>
 
-`ReadToEndAsync` builds a **UTF-16 string** (2 bytes per char, ~120 KB here, which is ≥ 85,000 bytes and lands on the LOH) through intermediate buffers; `Deserialize(string)` then transcodes it back to UTF-8. That's L02-03 (LOH churn) on the request path. `DeserializeAsync` reads UTF-8 from the stream directly.
+`ReadToEndAsync` builds a **UTF-16 string** (2 bytes per char: ~340 KB here, far over the 85,000-byte LOH threshold) through growing intermediate buffers, and `Deserialize(string)` then transcodes it back to UTF-8. That's L02-03 (LOH churn) on the request path. The properties the model doesn't declare are skipped without allocating, so the string is nearly all the garbage. `ReadFromJsonAsync` / `DeserializeAsync` parse UTF-8 from the stream directly.
 </details>

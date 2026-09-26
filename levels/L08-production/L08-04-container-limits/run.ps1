@@ -1,9 +1,9 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
-Runs the service under a cgroup memory limit. Requires Linux + systemd (systemd-run --user needs the
-memory controller delegated to your user; standard on Fedora). The memory limit itself is a real Linux
-cgroups feature; on Windows/macOS only the unlimited ("none") run works natively. Run this lab under
-WSL2 or a Linux container for the limited runs.
+Runs the service in a Linux container under a memory limit (docker or podman). Works on Windows, macOS
+and Linux: the limit is a cgroup applied by the container runtime, so it behaves the same everywhere.
+The image is built from ./Dockerfile on first use (layers are cached afterwards).
 
 .PARAMETER Limit
 Memory limit, e.g. "220M", or "none" for unlimited.
@@ -24,27 +24,24 @@ param(
 
 Set-Location $PSScriptRoot
 
-if ($Limit -eq "none") {
-    foreach ($pair in $EnvVars) {
-        $k, $v = $pair -split "=", 2
-        Set-Item -Path "Env:$k" -Value $v
-    }
-    & dotnet bin/service.dll --seconds 8 --live-mb 150
-    Write-Host "exit code: $LASTEXITCODE"
-    exit $LASTEXITCODE
-}
-
-if (-not (Get-Command systemd-run -ErrorAction SilentlyContinue)) {
-    Write-Host "No systemd-run here (needs Linux + systemd). The memory limit is a real cgroups feature,"
-    Write-Host "not something a script can emulate on Windows/macOS -- run this lab under WSL2 or a Linux"
-    Write-Host "container to see the limited runs. './run.ps1 none' still works natively everywhere."
+$engine = @("docker", "podman") | Where-Object { Get-Command $_ -ErrorAction SilentlyContinue } | Select-Object -First 1
+if (-not $engine) {
+    Write-Host "Neither docker nor podman found. Install Docker Desktop (Windows/macOS) or Docker/Podman (Linux)."
     exit 1
 }
 
-$sdArgs = @("--user", "--scope", "-q", "-p", "MemoryMax=$Limit", "-p", "MemorySwapMax=0")
-foreach ($pair in $EnvVars) { $sdArgs += @("-E", $pair) }
-$sdArgs += @("dotnet", "bin/service.dll", "--seconds", "8", "--live-mb", "150")
+$image = "perflab-l08-04"
+& $engine build -q -t $image . | Out-Null
+if ($LASTEXITCODE -ne 0) { Write-Host "image build failed"; exit $LASTEXITCODE }
 
-& systemd-run @sdArgs
+$runArgs = @("run", "--rm")
+if ($Limit -ne "none") {
+    # Limit RAM and disallow swap (memory-swap == memory), like MemorySwapMax=0 in the old systemd version.
+    $runArgs += @("--memory=$Limit", "--memory-swap=$Limit")
+}
+foreach ($pair in $EnvVars) { $runArgs += @("-e", $pair) }
+$runArgs += $image
+
+& $engine @runArgs
 Write-Host "exit code: $LASTEXITCODE"
 exit $LASTEXITCODE

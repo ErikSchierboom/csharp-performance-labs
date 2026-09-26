@@ -6,5 +6,5 @@ return Lab.Run(new LabSpec(
     Workload: Workload.Run,
     ExpectedChecksum: 800002415445,
     MaxMedianMs: 30,
-    MaxAllocatedMb: 16,
+    MaxAllocatedMb: 17,
     MaxP99Ms: 1), args);

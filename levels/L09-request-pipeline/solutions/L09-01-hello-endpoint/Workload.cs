@@ -8,7 +8,7 @@ namespace HelloEndpoint;
 
 public static class Workload
 {
-    static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/hello", () => Results.Text("{\"message\":\"hello\"}", "application/json")));
+    private static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/hello", () => Results.Text("{\"message\":\"hello\"}", "application/json")));
 
     public static long Run() => Rig.Drive(users: 32, total: 4000, i => "/hello");
 }

@@ -1,3 +1,4 @@
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
 Starts the triage service. Watch it from another terminal.

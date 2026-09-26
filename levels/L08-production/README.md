@@ -1,4 +1,4 @@
-# Level 8: beyond the IDE (labs)
+# Level 8: production (beyond the IDE)
 
 No source code, no IDE, no debugger: just a running process and the CLI tools. Closer to what an actual production incident hands you.
 

@@ -124,7 +124,9 @@ public static class Lab
             ? "Time budgets: unscaled (fixed-delay workload, ScaleTime: false)."
             : Math.Abs(factor - 1.0) < 1e-9
                 ? "Time budgets: unscaled (PERFLAB_NO_SCALE=1)."
-                : $"Machine factor {factor:F2}x vs. reference (budget {spec.MaxMedianMs:F1} ms -> {timeBudget:F1} ms on this machine).");
+                : $"Machine factor {factor:F2}x vs. reference: time budgets scaled (median {spec.MaxMedianMs:F1} -> {timeBudget:F2} ms"
+                  + (Math.Abs(spec.MaxP99Ms - double.MaxValue) > 0 ? $", p99 {spec.MaxP99Ms:F1} -> {spec.MaxP99Ms * factor:F2} ms" : "")
+                  + ").");
         if (Math.Abs(spec.MaxFirstRunMs - double.MaxValue) < 1)   // when gated, it gets its own row in the results table instead
             Console.WriteLine($"First run: {firstMs:F1} ms (cold, part of the warm-up, not in the median).");
         Console.WriteLine();
@@ -197,19 +199,19 @@ public static class Lab
         {
             double p99 = p99s.Count > 0 ? Median(p99s) : double.NaN, b = spec.MaxP99Ms * factor;
             var ok = p99 <= b; extraOk &= ok;
-            Print("median p99", p99, b, "ms", ok, "F1");
+            Print("median p99", p99, b, "ms", ok);
         }
         if (Math.Abs(spec.MaxFirstRunMs - double.MaxValue) > 0)
         {
             double b = spec.MaxFirstRunMs * factor;
             var ok = firstMs <= b; extraOk &= ok;
-            Print("first run", firstMs, b, "ms", ok, "F1", "cold: before any warm-up");
+            Print("first run", firstMs, b, "ms", ok, note: "cold: before any warm-up");
         }
         if (Math.Abs(spec.MaxCpuMs - double.MaxValue) > 0)
         {
             double cpu = Median(cpus), b = spec.MaxCpuMs * factor;
             var ok = cpu <= b; extraOk &= ok;
-            Print("median cpu", cpu, b, "ms", ok, "F1", "CPU time across all threads");
+            Print("median cpu", cpu, b, "ms", ok, note: "CPU time across all threads");
         }
         if (spec.MaxMetrics != null)
             foreach (var (name, max) in spec.MaxMetrics)

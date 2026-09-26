@@ -14,10 +14,12 @@ public static class Workload
         app.Use(async (ctx, next) =>
         {
             var logger = ctx.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger("audit");
-            var match = new Regex(@"^/api/(?<area>\w+)/(?<id>\d+)$").Match(ctx.Request.Path.Value ?? "");      // built per request
-            string tag = "area=" + match.Groups["area"].Value + ";id=" + match.Groups["id"].Value;
-            logger.LogInformation($"Handling request {ctx.Request.Path} ({tag}) from {ctx.Connection.RemoteIpAddress}");   // formatted even if no one listens
+            var match = new Regex(@"^/api/(?<area>\w+)/(?<id>\d+)$").Match(ctx.Request.Path.Value ?? "");
+            var tag = "area=" + match.Groups["area"].Value + ";id=" + match.Groups["id"].Value;
+            
+            logger.LogInformation($"Handling request {ctx.Request.Path} ({tag}) from {ctx.Connection.RemoteIpAddress}");
             ctx.Response.Headers["X-Trace"] = tag.ToUpperInvariant();
+            
             await next();
         });
         app.MapGet("/api/orders/{id:int}", (int id) => (id * 2).ToString());

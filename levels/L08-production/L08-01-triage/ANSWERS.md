@@ -1,17 +1,16 @@
-# Answers (measured)
+# Answers
 
-> Measured on a 20-core Linux box, .NET 10, `dotnet-counters collect` with a 2-second refresh, averaged over ~8 s. Absolute numbers depend on your machine; the *signatures* should match.
 
 | Scenario | Diagnosis | What the counters showed |
 |---|---|---|
-| **a** | **CPU-bound** | CPU ≈ **4.0 cores** (4 busy threads); GC idle (no gen2, no pauses); no pool queue; no contention |
-| **b** | **GC pressure** (large-object churn) | ~**400 gen2 collections per 2 s**; GC pause ≈ 0.23 s per 2 s (~11% of wall time); allocation ≈ 4 GB per 2 s; CPU only ≈ 0.5 core |
-| **c** | **Thread-pool starvation** (sync-over-async) | CPU ≈ **0.1 core** (almost idle); pool **queue length > 0** (≈ 3) and thread count ≈ 13 and *growing*; a few lock contentions from `Task.Wait` |
-| **d** | **Lock contention** | CPU ≈ 0.04 core; **~20 lock contentions per 2 s**; *no* pool activity (it uses dedicated threads) |
-| **e** | **Healthy / idle** | CPU ≈ 0.05 core; nothing else moving: don't fix it |
+| **a** | **CPU-bound** | `dotnet.process.cpu.time` with `cpu.mode=user` ≈ 4 per 1 s interval ≈ 4 cores busy (out of `cpu.count` = 20, so ~20% of the machine);<br/>`cpu.time[mode=system]` ≈ 0. GC idle (0 collections in every generation, no pauses);<br/> thread-pool counters all 0 (the busy threads must be dedicated `Thread`s, not pool threads); |
+| **b** | **GC pressure** | ~**200–250 gen2 collections per second**<br/>~0 gen0/gen1: every collection is a gen2 because the LOH triggers it);<br/>GC pause = 0.08–0.09 s per second (~8-9% of wall time);<br/> allocation ≈ 2-3 GB per s;<br/> CPU only ≈ 0.4–0.5 core |
+| **c** | **Thread-pool starvation** | CPU ≈ **0.1 core** (almost idle);<br/>pool **queue length ≈ 70-180** that doesn't drain;<br/>pool **thread count ≈ 80 -> 200 and climbing** (the meter shows this as about +10 threads per 2 s);<br/>~10–30 lock contentions per 2 s from `Task.Wait` internals, the **same range as d**. After ~25 s the pool has injected enough threads (~200) that the starvation clears: the queue drains, CPU and throughput jump. **Measure within the first 20 s.** |
+| **d** | **Lock contention** | CPU ≈ 0.05 core;<br/>**~20 lock contentions per 2 s**, steady; *no* pool activity at all: 0 threads, 0 queue, 0 work items (it uses dedicated threads) |
+| **e** | **Healthy** | CPU ≈ 0.05 core;<br/>~14 pool threads, **queue 0**, ~2000 work items/s completing smoothly;<br/>no GC;<br/>an occasional stray contention. Nothing saturated: don't fix it |
 
 ## Question 1: which two look alike, and what separates them?
-**c and d** (both idle CPU, slow work). Thread-pool queue length / thread count moves only in **c**; `lock_contentions` is the signal in **d**. (c also shows a few contentions, from `Task.Wait` internals; it's the *pool* counters that identify it.)
+**c and d** (both idle CPU, slow work, and *both* show lock contentions at a similar rate, so `lock_contentions` does **not** separate them). The separating counter is the **thread pool**: in **c** the queue length is large and the thread count keeps climbing. In **d** every pool counter is flat at 0, because the contending threads are dedicated `Thread`s. So c is "pool counters + contentions" and d is "contentions only".
 
 ## Question 2: which would a CPU sampling profile fail to explain?
 **c and d** (and **e**, which is fine): threads that are *waiting* aren't on CPU, so a CPU profile is nearly empty. Use the **timeline/trace** view or thread stacks (`dotnet-stack`/`dotnet-dump analyze`, `clrstack`) to see what they wait on.
@@ -31,4 +30,8 @@
 Classify by **resource** (USE: utilisation, saturation, errors) first; pick the heavier tool second.
 
 ## Reveal
-`a` busy loops on 4 threads · `b` allocates 100–300 KB arrays constantly · `c` bursts of 200 `Task.Run(() => asyncCall().Result)` with the pool pinned to 4 threads · `d` 16 threads taking one lock and sleeping 2 ms inside it · `e` 200 async loops awaiting `Task.Delay`.
+- `a` busy loops on 4 threads 
+- `b` allocates 100–300 KB arrays constantly
+- `c` bursts of 200 `Task.Run(() => asyncCall().Result)` with the pool pinned to 4 threads
+- `d` 16 threads taking one lock and sleeping 2 ms inside it
+- `e` 200 async loops awaiting `Task.Delay`.

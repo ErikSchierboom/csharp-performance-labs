@@ -7,7 +7,7 @@ Measure bytes and CPU **per request** (the harness's total ÷ 4,000). Then profi
 
 <details><summary>Hint 2: where?</summary>
 
-Follow one request through the pipeline: routing → controller activation → action invocation → result execution → output formatter. Which of those layers exist for a minimal API?
+Follow one request through the pipeline: routing -> controller activation -> action invocation -> result execution -> output formatter. Which of those layers exist for a minimal API?
 </details>
 
 <details><summary>Hint 3: why?</summary>
