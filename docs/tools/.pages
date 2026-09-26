@@ -1,0 +1,11 @@
+nav:
+  - README.md
+  - dotnet-counters.md
+  - dotnet-trace.md
+  - dotnet-gcdump.md
+  - dotnet-dump.md
+  - dotnet-stack.md
+  - perf.md
+  - strace.md
+  - ss.md
+  - taskset.md
