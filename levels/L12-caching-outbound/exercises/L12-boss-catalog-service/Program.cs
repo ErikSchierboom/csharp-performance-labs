@@ -2,7 +2,7 @@ using CatalogService;
 using PerfLab.Harness;
 
 return Lab.Run(new LabSpec(
-    Name: "L12-boss-catalog-service: Catalog service (final boss of Level 12)",
+    Name: "L12-boss-catalog-service",
     Workload: Workload.Run,
     ExpectedChecksum: 300000907500,
     MaxMedianMs: 1309,

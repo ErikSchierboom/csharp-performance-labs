@@ -11,17 +11,17 @@ Run one: `dotnet run -c Release --project levels/L12-caching-outbound/exercises/
 **Further reading:** [Level 12 reading list](../../docs/READING-LIST.md#level-12-caching-outbound-calls)
 
 ## Exercises
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L12-01-client-lifetime](exercises/L12-01-client-lifetime/README.md) | HttpClient created per request | [solution](solutions/L12-01-client-lifetime/SOLUTION.md) |
-| [L12-02-cache-stampede](exercises/L12-02-cache-stampede/README.md) | Cache stampede | [solution](solutions/L12-02-cache-stampede/SOLUTION.md) |
-| [L12-03-unbounded-memory-cache](exercises/L12-03-unbounded-memory-cache/README.md) | Unbounded MemoryCache | [solution](solutions/L12-03-unbounded-memory-cache/SOLUTION.md) |
-| [L12-04-output-cache](exercises/L12-04-output-cache/README.md) | Cacheable responses computed every time | [solution](solutions/L12-04-output-cache/SOLUTION.md) |
-| [L12-05-retry-storm](exercises/L12-05-retry-storm/README.md) | Retry storm | [solution](solutions/L12-05-retry-storm/SOLUTION.md) |
+| [L12-01-downstream-call](exercises/L12-01-downstream-call/README.md) | Downstream call | [solution](solutions/L12-01-downstream-call/SOLUTION.md) |
+| [L12-02-popular-items](exercises/L12-02-popular-items/README.md) | Popular items | [solution](solutions/L12-02-popular-items/SOLUTION.md) |
+| [L12-03-search-results](exercises/L12-03-search-results/README.md) | Search results | [solution](solutions/L12-03-search-results/SOLUTION.md) |
+| [L12-04-report-service](exercises/L12-04-report-service/README.md) | Report service | [solution](solutions/L12-04-report-service/SOLUTION.md) |
+| [L12-05-flaky-downstream](exercises/L12-05-flaky-downstream/README.md) | Flaky downstream | [solution](solutions/L12-05-flaky-downstream/SOLUTION.md) |
 
 ## Final boss fight
 A disguised combination of this level's defects: no per-defect hints. Do it last, then write down which exercise each defect came from.
 
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
 | [L12-boss-catalog-service](exercises/L12-boss-catalog-service/README.md) | Catalog service (final boss of Level 12) | [solution](solutions/L12-boss-catalog-service/SOLUTION.md) |

@@ -21,27 +21,27 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[10]](#ref10): a map of the runtime's own docs.
 - [[11]](#ref11): a curated index of books, talks and blogs. Use it to find more than this list has.
 - [the runtime guide](RUNTIME.md), then [[105]](#ref105) (the settings) and [[106]](#ref106) (the tiered-compilation design), and later [[55]](#ref55), [[56]](#ref56), [[102]](#ref102).
-- [[108]](#ref108), [[109]](#ref109): the runtime source that decides between a plain `Memmove` and a write-barrier bulk move (why L0-01's hot frame is `BulkMoveWithWriteBarrierBatch`, not `memmove`).
-- [[107]](#ref107): amortised analysis of dynamic arrays, the background to why `List<T>.Insert(0, …)` in a loop is quadratic and `Add` is not (the L0-01 solution's further reading).
+- [[108]](#ref108), [[109]](#ref109): the runtime source that decides between a plain `Memmove` and a write-barrier bulk move (why L00-01's hot frame is `BulkMoveWithWriteBarrierBatch`, not `memmove`).
+- [[107]](#ref107): amortised analysis of dynamic arrays, the background to why `List<T>.Insert(0, …)` in a loop is quadratic and `Add` is not (the L00-01 solution's further reading).
 
 ## Level 1: Obvious hot spots
 - [[12]](#ref12): profiling modes (sampling, tracing, line-by-line, timeline).
-- [[13]](#ref13), [[14]](#ref14): why `[GeneratedRegex]` beats `Compiled` (L1-03).
-- [[15]](#ref15): `TryParse`, the tester-doer pattern (L1-04).
-- [[16]](#ref16): LINQ deferred execution (L1-05).
+- [[13]](#ref13), [[14]](#ref14): why `[GeneratedRegex]` beats `Compiled` (L01-03).
+- [[15]](#ref15): `TryParse`, the tester-doer pattern (L01-04).
+- [[16]](#ref16): LINQ deferred execution (L01-05).
 - [[17]](#ref17), [[18]](#ref18): on reading a call tree as a picture.
 
 ## Level 2: Allocations & GC pressure
 - [[1]](#ref1): the chapters on allocation, LOH and finalization.
-- [[19]](#ref19): the 85,000-byte threshold (L2-03).
-- [[20]](#ref20): L2-02, L2-06.
-- [[21]](#ref21), [[22]](#ref22): L2-02, L2-03.
-- [[23]](#ref23): key line: the default choice is still `Task` (L2-05).
+- [[19]](#ref19): the 85,000-byte threshold (L02-03).
+- [[20]](#ref20): L02-02, L02-06.
+- [[21]](#ref21), [[22]](#ref22): L02-02, L02-03.
+- [[23]](#ref23): key line: the default choice is still `Task` (L02-05).
 - [[24]](#ref24): how async methods themselves avoid allocating.
-- [[25]](#ref25): closure allocations (L2-02), and [[26]](#ref26) his blog generally.
+- [[25]](#ref25): closure allocations (L02-02), and [[26]](#ref26) his blog generally.
 - [[27]](#ref27): for what a closure actually captures.
 - [[28]](#ref28): assert memory traffic in a unit test, the same idea as this repo's `MaxAllocatedMB`.
-- [[29]](#ref29), [[30]](#ref30): Dispose and finalizers (L2-04).
+- [[29]](#ref29), [[30]](#ref30): Dispose and finalizers (L02-04).
 
 ## Level 3: Leaks & retention
 - [[31]](#ref31), [[32]](#ref32): real leak scenarios with walkthroughs (originally WinDbg-based).
@@ -49,23 +49,23 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[1]](#ref1): chapters on GC roots, finalization, weak references.
 - [[34]](#ref34): pinned objects (relevant again at Level 7).
 - [[35]](#ref35): deep dives into the GC and debugging.
-- [[36]](#ref36), [[37]](#ref37): weak references and `ConditionalWeakTable` (L3-05).
+- [[36]](#ref36), [[37]](#ref37): weak references and `ConditionalWeakTable` (L03-05).
 
 ## Level 4: Async & concurrency
-- [[38]](#ref38): long, worth it. Read after L2-05.
-- [[39]](#ref39): debug ThreadPool starvation (L4-01).
+- [[38]](#ref38): long, worth it. Read after L02-05.
+- [[39]](#ref39): debug ThreadPool starvation (L04-01).
 - [[40]](#ref40): how queuing makes starvation worse.
 - [[6]](#ref6): Channels, `SemaphoreSlim`, throttling.
 - [[41]](#ref41): bad/good async patterns from real incidents.
-- [[42]](#ref42), [[43]](#ref43): `System.Threading.Channels`, `Parallel.ForEachAsync` (L4-03, L4-05).
+- [[42]](#ref42), [[43]](#ref43): `System.Threading.Channels`, `Parallel.ForEachAsync` (L04-03, L04-05).
 - [[44]](#ref44): old, but the reference on locks and memory models.
 - [[45]](#ref45): `dotnet-counters`.
 
 ## Level 5: Library stack under a single caller
-- [[46]](#ref46), [[47]](#ref47): efficient querying, tracking vs. no-tracking (L5-01…03).
+- [[46]](#ref46), [[47]](#ref47): efficient querying, tracking vs. no-tracking (L05-01…03).
 - [[48]](#ref48).
-- [[49]](#ref49): HttpClient guidelines (L5-04).
-- [[50]](#ref50), [[51]](#ref51): JSON source generation, high-performance logging (L5-05, L5-06).
+- [[49]](#ref49): HttpClient guidelines (L05-04).
+- [[50]](#ref50), [[51]](#ref51): JSON source generation, high-performance logging (L05-05, L05-06).
 - [[2]](#ref2): the JSON, logging and I/O sections of the yearly performance posts.
 
 ## Level 6: Hardware & runtime effects
@@ -102,12 +102,12 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 ## The ASP.NET Core levels (9–14)
 
 ## Level 9: The request pipeline
-- [[77]](#ref77): the "avoid blocking" and "minimize large object allocations" sections match L2-03 and L10.
+- [[77]](#ref77): the "avoid blocking" and "minimize large object allocations" sections match L02-03 and L10.
 - [[78]](#ref78): memory management and patterns in ASP.NET Core.
 - [[79]](#ref79), [[80]](#ref80): ASP.NET Core 8 and 6 performance posts. I did not find a dedicated ASP.NET Core 10 post; check [[81]](#ref81).
 - [[82]](#ref82): pipeline, DI, hosting, and [[83]](#ref83) his blog generally.
 - [[84]](#ref84): general ASP.NET Core guidance.
-- [[85]](#ref85): dependency injection and service-lifetime guidance (L9-04).
+- [[85]](#ref85): dependency injection and service-lifetime guidance (L09-04).
 - [[86]](#ref86): see what a maximally tuned pipeline can reach, and treat it as an upper bound, not a target.
 
 ## Level 10: Async, threads & the pool under load
@@ -121,8 +121,8 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[46]](#ref46), [[47]](#ref47).
 - [[89]](#ref89): DbContext pooling, compiled queries.
 - [[90]](#ref90): chapters on storage/indexes and transactions.
-- [[91]](#ref91): the clearest treatment of indexes and paging (L11-02, L5-03).
-- [[92]](#ref92): Npgsql connection pooling (L11-04).
+- [[91]](#ref91): the clearest treatment of indexes and paging (L05-03).
+- [[92]](#ref92): Npgsql connection pooling (L11-03).
 - [[93]](#ref93): finding N+1 from traces (L11-01).
 
 ## Level 12: Caching & outbound calls
@@ -257,7 +257,7 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 
 <a id="ref52"></a>[52] U. Drepper, "What Every Programmer Should Know About Memory," 2007. [Online]. Available: [https://www.akkadia.org/drepper/cpumemory.pdf](https://www.akkadia.org/drepper/cpumemory.pdf)
 
-<a id="ref53"></a>[53] D. Bakhvalov, *Performance Analysis and Tuning on Modern CPUs*. [Online]. Available: [https://book.easyperf.net/perf_book](https://book.easyperf.net/perf_book)
+<a id="ref53"></a>[53] D. Bakhvalov, *Performance Analysis and Tuning on Modern CPUs*. [Online]. Available: [https://github.com/dendibakh/perf-book](https://github.com/dendibakh/perf-book)
 
 <a id="ref54"></a>[54] BenchmarkDotNet, "Diagnosers," BenchmarkDotNet docs. [Online]. Available: [https://benchmarkdotnet.org/articles/configs/diagnosers.html](https://benchmarkdotnet.org/articles/configs/diagnosers.html)
 

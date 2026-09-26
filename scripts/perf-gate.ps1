@@ -1,4 +1,4 @@
-#!/bin/pwsh
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
 Perf gate: every *solution* must PASS its budgets (exit 0) and every *exercise* must FAIL them (exit 1).
@@ -6,11 +6,11 @@ A green run means the budgets still separate the fixed code from the slow code, 
 catch regressions.
 
 .PARAMETER Prefix
-Optional name prefix to restrict which exercises/solutions are checked, e.g. "L2" or "L4-01".
+Optional name prefix to restrict which exercises/solutions are checked, e.g. "L02" or "L04-01".
 
 .EXAMPLE
 ./scripts/perf-gate.ps1
-./scripts/perf-gate.ps1 L2
+./scripts/perf-gate.ps1 L02
 #>
 param(
     [string]$Prefix = ""
@@ -48,7 +48,7 @@ foreach ($kind in @("solutions", "exercises")) {
 
         $name = "$kind/$($d.Name)"
 
-        # Exploration exercises (no pass/fail budget, e.g. L6-07 warm-up curve) are skipped.
+        # Exploration exercises (no pass/fail budget, e.g. L06-07 warm-up curve) are skipped.
         if ($hasProgram -and (Select-String -Path $programCs -Pattern "no pass/fail gate" -Quiet)) {
             "{0,-34} {1,-9} {2,-9} {3}" -f $name, "n/a", "n/a", "skipped (exploration)" | Write-Host
             continue

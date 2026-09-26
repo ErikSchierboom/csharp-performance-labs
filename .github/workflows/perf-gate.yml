@@ -11,6 +11,6 @@ jobs:
         with: { dotnet-version: '10.0.x' }
       - name: Perf gate (Level 2 only, as an example)
         shell: pwsh
-        run: ./scripts/perf-gate.ps1 L2
+        run: ./scripts/perf-gate.ps1 L02
         env:
           PERFLAB_NO_SCALE: '0'

@@ -31,7 +31,7 @@ Hypotheses I held that were false, and what evidence killed them.
 One regression gate (budget, test, alert) per root cause.
 
 #### Earlier exercise it resembles
-e.g. L2-03 LOH churn
+e.g. L02-03 LOH churn
 ```
 
 Further reading: the postmortem chapters of Google's *Site Reliability Engineering* book ([[73]](../docs/READING-LIST.md#ref73)).

@@ -19,7 +19,7 @@ Requires [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/
 2. Point the CLI tools at that pid from a second terminal: `dotnet-counters`, `dotnet-trace`, `dotnet-gcdump`, `dotnet-dump`, per the lab.
 3. Fill in `<lab>/QUESTIONS.md` **before** opening `<lab>/ANSWERS.md`.
 
-Labs: [L8-01-triage](L8-01-triage/README.md) · [L8-02-flame-graph](L8-02-flame-graph/README.md) · [L8-03-who-holds-memory](L8-03-who-holds-memory/README.md) · [L8-04-container-limits](L8-04-container-limits/README.md) · [L8-05-perf-gate](L8-05-perf-gate/README.md)
+Labs: [L08-01-triage](L08-01-triage/README.md) · [L08-02-flame-graph](L08-02-flame-graph/README.md) · [L08-03-who-holds-memory](L08-03-who-holds-memory/README.md) · [L08-04-container-limits](L08-04-container-limits/README.md) · [L08-05-perf-gate](L08-05-perf-gate/README.md)
 
 **Further reading:** [Level 8 reading list](../../docs/READING-LIST.md#level-8-beyond-the-ide)
 

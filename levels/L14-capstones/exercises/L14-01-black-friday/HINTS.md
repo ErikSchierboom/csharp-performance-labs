@@ -12,5 +12,5 @@ Fix the layer nearest the user first, then re-measure; the next problem will loo
 
 <details><summary>Hint 3: why?</summary>
 
-This is L12-02 (stampede), L12-05 (retry storm) and L11-04 (connection held across a slow call) in one request path. Each amplifies the next: a cold cache creates concurrent loads → the third party overloads → immediate retries add load → connections are held longer → the pool starves.
+This is L12-02 (stampede), L12-05 (retry storm) and L11-03 (connection held across a slow call) in one request path. Each amplifies the next: a cold cache creates concurrent loads → the third party overloads → immediate retries add load → connections are held longer → the pool starves.
 </details>

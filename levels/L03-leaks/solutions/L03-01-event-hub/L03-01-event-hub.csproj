@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\PerfLab.Harness\PerfLab.Harness.csproj" />
+    <!-- Same Program.cs (checksum + budgets) as the exercise: one source of truth. -->
+    <Compile Include="..\..\exercises\L03-01-event-hub\Program.cs" Link="Program.cs" />
+  </ItemGroup>
+</Project>

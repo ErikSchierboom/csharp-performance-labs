@@ -11,18 +11,18 @@ Run one: `dotnet run -c Release --project levels/L10-async-under-load/exercises/
 **Further reading:** [Level 10 reading list](../../docs/READING-LIST.md#level-10-async-threads-the-pool-under-load)
 
 ## Exercises
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L10-01-sync-over-async](exercises/L10-01-sync-over-async/README.md) | Sync over async (in an endpoint) | [solution](solutions/L10-01-sync-over-async/SOLUTION.md) |
-| [L10-02-blocking-in-async](exercises/L10-02-blocking-in-async/README.md) | Blocking inside an async handler | [solution](solutions/L10-02-blocking-in-async/SOLUTION.md) |
-| [L10-03-endpoint-fan-out](exercises/L10-03-endpoint-fan-out/README.md) | Endpoint fan-out | [solution](solutions/L10-03-endpoint-fan-out/SOLUTION.md) |
-| [L10-04-rate-gate](exercises/L10-04-rate-gate/README.md) | Async lock around a cacheable call | [solution](solutions/L10-04-rate-gate/SOLUTION.md) |
-| [L10-05-cancellation](exercises/L10-05-cancellation/README.md) | Cancellation (work after the client left) | [solution](solutions/L10-05-cancellation/SOLUTION.md) |
-| [L10-06-fire-and-forget](exercises/L10-06-fire-and-forget/README.md) | Fire and forget (unbounded background work) | [solution](solutions/L10-06-fire-and-forget/SOLUTION.md) |
+| [L10-01-database-endpoint](exercises/L10-01-database-endpoint/README.md) | Database-backed endpoint | [solution](solutions/L10-01-database-endpoint/SOLUTION.md) |
+| [L10-02-async-handler](exercises/L10-02-async-handler/README.md) | Async handler | [solution](solutions/L10-02-async-handler/SOLUTION.md) |
+| [L10-03-aggregation-endpoint](exercises/L10-03-aggregation-endpoint/README.md) | Aggregation endpoint | [solution](solutions/L10-03-aggregation-endpoint/SOLUTION.md) |
+| [L10-04-currency-conversion](exercises/L10-04-currency-conversion/README.md) | Currency conversion | [solution](solutions/L10-04-currency-conversion/SOLUTION.md) |
+| [L10-05-impatient-clients](exercises/L10-05-impatient-clients/README.md) | Impatient clients | [solution](solutions/L10-05-impatient-clients/SOLUTION.md) |
+| [L10-06-background-jobs](exercises/L10-06-background-jobs/README.md) | Background jobs | [solution](solutions/L10-06-background-jobs/SOLUTION.md) |
 
 ## Final boss fight
 A disguised combination of this level's defects: no per-defect hints. Do it last, then write down which exercise each defect came from.
 
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
 | [L10-boss-async-quotes](exercises/L10-boss-async-quotes/README.md) | Async quotes (final boss of Level 10) | [solution](solutions/L10-boss-async-quotes/SOLUTION.md) |

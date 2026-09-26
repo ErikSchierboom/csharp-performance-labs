@@ -19,15 +19,15 @@ Books, articles and docs for every level: [docs/READING-LIST.md](docs/READING-LI
 | Level | Theme                                            | Profiling skill                               | Exercises | Final boss                    | Status |
 |-------|--------------------------------------------------|-----------------------------------------------|-----------|-------------------------------|--------|
 | 0     | Start here: worked example + foundations reading | sampling                                      | 1         | n/a                           | ✅     |
-| 1     | Obvious hot spots                                | sampling, tracing                             | 7         | `L1-boss-order-ledger`        | ✅     |
-| 2     | Allocations & GC pressure                        | allocation profiling                          | 9         | `L2-boss-shipment-manifest`   | ✅     |
-| 3     | Leaks & retention                                | heap snapshots, dominators                    | 6         | `L3-boss-session-gateway`     | ✅     |
-| 4     | Async & concurrency                              | timeline view, `dotnet-counters`              | 7         | `L4-boss-notification-hub`    | ✅     |
-| 5     | Library stack, single caller                     | SQL/HTTP/IO subsystem views                   | 8         | `L5-boss-order-report`        | ✅     |
-| 6     | Hardware & runtime effects                       | `perf stat`, JIT disassembly, BenchmarkDotNet | 9         | `L6-boss-sensor-grid`         | ✅     |
+| 1     | Obvious hot spots                                | sampling, tracing                             | 7         | `L01-boss-order-ledger`        | ✅     |
+| 2     | Allocations & GC pressure                        | allocation profiling                          | 9         | `L02-boss-shipment-manifest`   | ✅     |
+| 3     | Leaks & retention                                | heap snapshots, dominators                    | 6         | `L03-boss-session-gateway`     | ✅     |
+| 4     | Async & concurrency                              | timeline view, `dotnet-counters`              | 7         | `L04-boss-notification-hub`    | ✅     |
+| 5     | Library stack, single caller                     | SQL/HTTP/IO subsystem views                   | 8         | `L05-boss-order-report`        | ✅     |
+| 6     | Hardware & runtime effects                       | `perf stat`, JIT disassembly, BenchmarkDotNet | 9         | `L06-boss-sensor-grid`         | ✅     |
 | 7     | Boss fights                                      | everything                                    | 4         | (the whole level)             | ✅     |
-| 8     | Beyond the IDE (labs)                            | `dotnet-counters/trace/gcdump/dump`, cgroups  | 5 labs    | (L8-05 ties it together)      | ✅     |
-| 9     | ASP.NET: the request pipeline                    | load driver, allocation profiling             | 5         | `L9-boss-storefront-checkout` | ✅     |
+| 8     | Beyond the IDE (labs)                            | `dotnet-counters/trace/gcdump/dump`, cgroups  | 5 labs    | (L08-05 ties it together)      | ✅     |
+| 9     | ASP.NET: the request pipeline                    | load driver, allocation profiling             | 5         | `L09-boss-storefront-checkout` | ✅     |
 | 10    | ASP.NET: async, threads & the pool under load    | counters, timeline view                       | 6         | `L10-boss-async-quotes`       | ✅     |
 | 11    | ASP.NET: data access under load                  | EF logging, SQL counts                        | 4         | `L11-boss-orders-service`     | 🛠️     |
 | 12    | ASP.NET: caching & outbound calls                | counters                                      | 5         | `L12-boss-catalog-service`    | 🛠️     |
@@ -38,4 +38,4 @@ Books, articles and docs for every level: [docs/READING-LIST.md](docs/READING-LI
 
 *"Profiling skill" names the capability you need, not a specific product; see [docs/PROFILING-GUIDE.md](docs/PROFILING-GUIDE.md) for which tools (Rider, Visual Studio, the free CLI tools, `perf`) give you each one.*
 
-**How to work through it:** in order, 0 → 14. Each level ends with a **final boss fight**: a disguised combination of that level's defects with no per-defect hints (Levels 7 and 14 *are* boss levels). Levels 9–14 assume Levels 1–4; if you want ASP.NET sooner you can take Levels 9–10 right after Level 4 and Levels 11–12 after Level 5. Level 6 is independent of Levels 3–5. Each level has a **mastery checkpoint**: something to do *without notes* before moving on.
+**How to work through it:** in order, 0 to 14. Each level ends with a **final boss fight**: a disguised combination of that level's defects with no per-defect hints (Levels 7 and 14 *are* boss levels). Levels 9–14 assume Levels 1–4; if you want ASP.NET sooner you can take Levels 9–10 right after Level 4 and Levels 11–12 after Level 5. Level 6 is independent of Levels 3–5. Each level has a **mastery checkpoint**: something to do *without notes* before moving on.

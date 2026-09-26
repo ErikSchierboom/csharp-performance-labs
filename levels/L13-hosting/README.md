@@ -11,8 +11,8 @@ Run one: `dotnet run -c Release --project levels/L13-hosting/exercises/<id>` (ex
 **Further reading:** [Level 13 reading list](../../docs/READING-LIST.md#level-13-hosting-runtime-config-deployment)
 
 ## Exercises
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L13-03-connection-churn](exercises/L13-03-connection-churn/README.md) | Connection churn (`Connection: close`) | [solution](solutions/L13-03-connection-churn/SOLUTION.md) |
-| [L13-04-log-sink](exercises/L13-04-log-sink/README.md) | Log sink (synchronous logging on the request path) | [solution](solutions/L13-04-log-sink/SOLUTION.md) |
+| [L13-01-short-responses](exercises/L13-01-short-responses/README.md) | Short responses | [solution](solutions/L13-01-short-responses/SOLUTION.md) |
+| [L13-02-request-logging](exercises/L13-02-request-logging/README.md) | Request logging | [solution](solutions/L13-02-request-logging/SOLUTION.md) |
 

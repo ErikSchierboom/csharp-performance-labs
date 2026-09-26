@@ -2,7 +2,7 @@ using AsyncQuotes;
 using PerfLab.Harness;
 
 return Lab.Run(new LabSpec(
-    Name: "L10-boss-async-quotes: Async quotes (final boss of Level 10)",
+    Name: "L10-boss-async-quotes",
     Workload: Workload.Run,
     ExpectedChecksum: 80000241892,
     MaxMedianMs: 2164,

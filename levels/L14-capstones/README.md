@@ -11,8 +11,8 @@ Run one: `dotnet run -c Release --project levels/L14-capstones/exercises/<id>` (
 **Further reading:** [Level 14 reading list](../../docs/READING-LIST.md#level-14-production-diagnosis-capstones)
 
 ## Exercises
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
 | [L14-01-black-friday](exercises/L14-01-black-friday/README.md) | Black Friday (capstone) | [solution](solutions/L14-01-black-friday/SOLUTION.md) |
-| [L14-03-oom-killed](exercises/L14-03-oom-killed/README.md) | OOM-killed at 3 a.m. (capstone) | [solution](solutions/L14-03-oom-killed/SOLUTION.md) |
+| [L14-02-oom-killed](exercises/L14-02-oom-killed/README.md) | OOM-killed at 3 a.m. (capstone) | [solution](solutions/L14-02-oom-killed/SOLUTION.md) |
 

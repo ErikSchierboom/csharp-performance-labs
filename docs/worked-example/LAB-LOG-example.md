@@ -1,8 +1,8 @@
 # Lab-log entry
 
-Copy of the template from `templates/LAB-LOG.md`, completed for L0-01. Compare with your own after you've tried the exercise.
+Copy of the template from `templates/LAB-LOG.md`, completed for L00-01. Compare with your own after you've tried the exercise.
 
-## L0-01 activity-feed, 2026-09-20
+## L00-01 activity-feed, 2026-09-20
 
 #### Prediction
 Something quadratic, given "one simple operation per item". If I go from 60k to 600k items I expect roughly 100× the time, not 10×.

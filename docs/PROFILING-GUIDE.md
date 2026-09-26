@@ -56,10 +56,10 @@ Rough overhead ordering, cheapest to most invasive: **sampling ≈ allocations �
 3. When the app finishes, open the snapshot. Start at **Hot Spots**/**Call Tree**, sort by own time.
 4. For memory: take snapshots at different points, use **Compare**, then inspect **Dominators** / **Retention paths**.
 
-**Reading the totals in a sampling snapshot.** The root row (`100% all calls`) adds up the time of *every thread*, so it is usually much more than the time the app ran. Example: profiling L0-01 in profile mode (about 15 s) showed a root of `43,240 ms`. Three things to know:
+**Reading the totals in a sampling snapshot.** The root row (`100% all calls`) adds up the time of *every thread*, so it is usually much more than the time the app ran. Example: profiling L00-01 in profile mode (about 15 s) showed a root of `43,240 ms`. Three things to know:
 - Rider groups digits with a separator, so `43,240 ms` is **43 seconds**, not 43 milliseconds.
 - A .NET process has helper threads besides the one running `Main` (8 threads in total on the author's Linux machine, one of them doing all the work), and sampling also counts [threads that are sleeping or locked](https://www.jetbrains.com/help/profiler/Basic_Concepts.html). That is why the root is larger than the run.
-- To get a number you can compare with the harness, expand the root and open the **main thread** (or filter to it). Its total should be close to the length of the run. Divide `Feed.Build`'s time on that thread by the `Done: N iterations` line the harness prints and you get the time per iteration, about 190 ms for L0-01 (the same as measure mode). The [session options](https://www.jetbrains.com/help/profiler/Profiler_Options.html) also let you choose whether time when a thread isn't working is counted.
+- To get a number you can compare with the harness, expand the root and open the **main thread** (or filter to it). Its total should be close to the length of the run. Divide `Feed.Build`'s time on that thread by the `Done: N iterations` line the harness prints and you get the time per iteration, about 190 ms for L00-01 (the same as measure mode). The [session options](https://www.jetbrains.com/help/profiler/Profiler_Options.html) also let you choose whether time when a thread isn't working is counted.
 
 ### Visual Studio workflow
 1. Set the exercise as the startup project and pick the **Profile** launch profile (command-line arguments `--profile --seconds 15`, already set up in `Properties/launchSettings.json`). Switch the solution configuration to **Release** first: the launch profile can't do it, and Debug numbers are meaningless.
@@ -68,6 +68,7 @@ Rough overhead ordering, cheapest to most invasive: **sampling ≈ allocations �
 4. For memory: **Debug → Windows → Show Diagnostic Tools**, take **Memory Usage** snapshots before/after, then diff them to see what grew.
 
 ### CLI
+One page per tool, with what to type and how to read the output: [docs/tools](tools/README.md). The short version:
 ```bash
 dotnet tool install --global dotnet-counters
 dotnet tool install --global dotnet-trace
@@ -95,9 +96,9 @@ BenchmarkDotNet's `[HardwareCounters]` is Windows-only (per its docs), so on Lin
 ```bash
 sudo dnf install perf                       # Fedora; other distros: linux-tools / perf
 # perf may need:  sudo sysctl kernel.perf_event_paranoid=1   (or run with sudo)
-dotnet build -c Release levels/L06-hardware-runtime/exercises/L6-01-matrix-walk
+dotnet build -c Release levels/L06-hardware-runtime/exercises/L06-01-matrix-walk
 perf stat -e cycles,instructions,cache-references,cache-misses,branches,branch-misses \
-  dotnet levels/L06-hardware-runtime/exercises/L6-01-matrix-walk/bin/Release/net10.0/L6-01-matrix-walk.dll --profile --seconds 5
+  dotnet levels/L06-hardware-runtime/exercises/L06-01-matrix-walk/bin/Release/net10.0/L06-01-matrix-walk.dll --profile --seconds 5
 ```
 Read: **IPC** (instructions / cycles: low means stalls), **cache-miss rate**, **branch-miss rate**. Compare the exercise and the solution with the same `--seconds`.
 Not every counter is available in VMs/containers; if you see `<not supported>`, that hardware event isn't exposed there.
@@ -105,9 +106,10 @@ Not every counter is available in VMs/containers; if you see `<not supported>`, 
 ### 2. JIT disassembly: what code did you actually get?
 ```bash
 DOTNET_JitDisasm="Run" DOTNET_JitStdOutFile=/tmp/run.asm \
-  dotnet levels/L06-hardware-runtime/exercises/L6-05-transform-batch/bin/Release/net10.0/L6-05-transform-batch.dll
+  dotnet levels/L06-hardware-runtime/exercises/L06-05-transform-batch/bin/Release/net10.0/L06-05-transform-batch.dll
 ```
 `DOTNET_JitDisasm` accepts method names/patterns (`Workload:Run`, `*Score*`). It prints the code for **each tier** a method is compiled at; look at the last (Tier-1) one.
+It only shows methods *the JIT compiles*. If your code calls into the framework (`span.Count`, `IndexOf`, `Sum`), the interesting loop is in the framework method, so ask for that name (`SpanHelpers:*`, `*CountValueType*`). Framework methods start out as precompiled ReadyToRun code and only show up once they've been called often enough to be recompiled. If nothing appears, run in `--profile` mode or set `DOTNET_ReadyToRun=0`.
 Things to look for: block copies before calls (defensive copies), `call [reg+…]` (indirect call, so no inlining), `vpcmpeqd`/`vpaddd` (SIMD), `cmov` (branchless) vs `jl`/`jge` (branch), bounds-check `cmp`+`jae` sequences.
 
 ### 3. BenchmarkDotNet: trustworthy micro-measurements

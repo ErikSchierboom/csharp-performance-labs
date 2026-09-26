@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\PerfLab.Harness\PerfLab.Harness.csproj" />
+    <RuntimeHostConfigurationOption Include="System.GC.DynamicAdaptationMode" Value="0" />   <!-- found this in a tuning tutorial! -->
+  </ItemGroup>
+</Project>

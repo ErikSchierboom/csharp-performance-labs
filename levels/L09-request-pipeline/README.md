@@ -11,17 +11,17 @@ Run one: `dotnet run -c Release --project levels/L09-request-pipeline/exercises/
 **Further reading:** [Level 9 reading list](../../docs/READING-LIST.md#level-9-the-request-pipeline)
 
 ## Exercises
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L9-01-hello-tax](exercises/L9-01-hello-tax/README.md) | Hello tax (what does a free endpoint cost?) | [solution](solutions/L9-01-hello-tax/SOLUTION.md) |
-| [L9-02-pipeline-tax](exercises/L9-02-pipeline-tax/README.md) | Pipeline tax (per-request work in middleware) | [solution](solutions/L9-02-pipeline-tax/SOLUTION.md) |
-| [L9-03-chatty-writer](exercises/L9-03-chatty-writer/README.md) | Chatty writer (many small writes) | [solution](solutions/L9-03-chatty-writer/SOLUTION.md) |
-| [L9-04-di-lifetimes](exercises/L9-04-di-lifetimes/README.md) | DI lifetimes (a container per request) | [solution](solutions/L9-04-di-lifetimes/SOLUTION.md) |
-| [L9-05-body-buffering](exercises/L9-05-body-buffering/README.md) | Request body (buffered into a string) | [solution](solutions/L9-05-body-buffering/SOLUTION.md) |
+| [L09-01-hello-endpoint](exercises/L09-01-hello-endpoint/README.md) | Hello endpoint | [solution](solutions/L09-01-hello-endpoint/SOLUTION.md) |
+| [L09-02-audit-middleware](exercises/L09-02-audit-middleware/README.md) | Audit middleware | [solution](solutions/L09-02-audit-middleware/SOLUTION.md) |
+| [L09-03-report-endpoint](exercises/L09-03-report-endpoint/README.md) | Report endpoint | [solution](solutions/L09-03-report-endpoint/SOLUTION.md) |
+| [L09-04-price-endpoint](exercises/L09-04-price-endpoint/README.md) | Price endpoint | [solution](solutions/L09-04-price-endpoint/SOLUTION.md) |
+| [L09-05-import-endpoint](exercises/L09-05-import-endpoint/README.md) | Import endpoint | [solution](solutions/L09-05-import-endpoint/SOLUTION.md) |
 
 ## Final boss fight
 A disguised combination of this level's defects: no per-defect hints. Do it last, then write down which exercise each defect came from.
 
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L9-boss-storefront-checkout](exercises/L9-boss-storefront-checkout/README.md) | Storefront checkout (final boss of L9) | [solution](solutions/L9-boss-storefront-checkout/SOLUTION.md) |
+| [L09-boss-storefront-checkout](exercises/L09-boss-storefront-checkout/README.md) | Storefront checkout (final boss of L9) | [solution](solutions/L09-boss-storefront-checkout/SOLUTION.md) |

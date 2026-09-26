@@ -39,6 +39,11 @@ namespace PerfLab.Harness;
 /// wall-clock wait (<c>Task.Delay</c>, <c>Thread.Sleep</c>, a real socket connect) rather than CPU work: a faster
 /// CPU doesn't make those waits shorter, so scaling the budget down for a fast machine would fail a correct fix.
 /// </param>
+/// <param name="MaxFirstRunMs">
+/// Optional budget for the very first run (the first warm-up run: cold JIT, cold caches, an unwarmed thread pool), in
+/// reference ms, scaled like <see cref="MaxMedianMs"/>. The first run's time is always printed; set this when the
+/// exercise is about start-up behaviour that warm-up would otherwise hide. <see cref="double.MaxValue"/> means not gated.
+/// </param>
 public sealed record LabSpec(
     string Name,
     Func<long> Workload,
@@ -54,12 +59,14 @@ public sealed record LabSpec(
     double MaxP99Ms = double.MaxValue,
     double MaxCpuMs = double.MaxValue,
     Dictionary<string, double>? MaxMetrics = null,
-    bool ScaleTime = true);
+    bool ScaleTime = true,
+    double MaxFirstRunMs = double.MaxValue);
 
 /// <summary>
-/// Two modes:
-///   (default)   warm up, measure N runs, print a table, PASS/FAIL against the budgets.
-///   --profile   run the workload in a loop for --seconds (default 15) so a profiler gets plenty of samples.
+/// Modes:
+///   (default)     warm up, measure N runs, print a table, PASS/FAIL against the budgets.
+///   --profile     run the workload in a loop for --seconds (default 15) so a profiler gets plenty of samples.
+///   --calibrate   print this machine's raw spin-loop time, pinned to one core, to (re)set ReferenceSpinMs.
 /// Exit codes: 0 = pass, 1 = over budget, 2 = wrong result (you broke behaviour).
 /// </summary>
 public static class Lab
@@ -85,6 +92,7 @@ public static class Lab
         Console.WriteLine($"== {spec.Name} ==");
         WarnAboutEnvironment();
 
+        if (args.Contains("--calibrate")) return RunCalibrate();
         if (args.Contains("--cold")) return RunCold(spec, GetInt(args, "--runs", 12));
         return args.Contains("--profile")
             ? RunProfile(spec, GetInt(args, "--seconds", 15))
@@ -99,10 +107,14 @@ public static class Lab
         // background thread after a ~100 ms quiet period, so two quick runs would leave a correct, fast fix still
         // running its slow tier-0 code in the measured runs. (That is itself a Level 6 topic.)
         var warmStart = Stopwatch.GetTimestamp();
+        var firstMs = 0.0;
         for (var i = 0; i < MaxWarmupRuns; i++)
         {
             spec.Reset?.Invoke();
-            if (!CheckResult(spec, spec.Workload())) return 2;
+            var runStart = Stopwatch.GetTimestamp();
+            var warmResult = spec.Workload();
+            if (i == 0) firstMs = Stopwatch.GetElapsedTime(runStart).TotalMilliseconds;
+            if (!CheckResult(spec, warmResult)) return 2;
             if (i + 1 >= spec.WarmupRuns && (!spec.TimedWarmup || Stopwatch.GetElapsedTime(warmStart).TotalMilliseconds >= MinWarmupMs)) break;
         }
 
@@ -112,7 +124,9 @@ public static class Lab
             ? "Time budgets: unscaled (fixed-delay workload, ScaleTime: false)."
             : Math.Abs(factor - 1.0) < 1e-9
                 ? "Time budgets: unscaled (PERFLAB_NO_SCALE=1)."
-                : $"Machine factor {factor:F2}x vs. reference (budget {spec.MaxMedianMs:F0} ms -> {timeBudget:F0} ms on this machine).");
+                : $"Machine factor {factor:F2}x vs. reference (budget {spec.MaxMedianMs:F1} ms -> {timeBudget:F1} ms on this machine).");
+        if (Math.Abs(spec.MaxFirstRunMs - double.MaxValue) < 1)   // when gated, it gets its own row in the results table instead
+            Console.WriteLine($"First run: {firstMs:F1} ms (cold, part of the warm-up, not in the median).");
         Console.WriteLine();
 
         var times = new List<double>();
@@ -171,36 +185,51 @@ public static class Lab
         var retOk = !retGated || medRet <= spec.MaxRetainedMb;
 
         Console.WriteLine();
-        Console.WriteLine($"median time:\t{medMs,9:F1} ms\tbudget {timeBudget,8:F1} ms\t{(timeOk ? "PASS" : "FAIL")}");
-        Console.WriteLine($"median alloc:\t{medMb,9:F2} MB\tbudget {spec.MaxAllocatedMb,8:F2} MB\t{(allocOk ? "PASS" : "FAIL")}");
+        Row("metric", "value", "budget", "unit", "result");
+        Print("median time", medMs, timeBudget, "ms", timeOk);
+        Print("median alloc", medMb, spec.MaxAllocatedMb, "MB", allocOk);
         if (gen2Gated)
-            Console.WriteLine($"median gen2:\t{medGen2,9:F0}\tbudget {spec.MaxGen2Collections,8}\t{(gen2Ok ? "PASS" : "FAIL")}");
+            Print("median gen2", medGen2, spec.MaxGen2Collections, "", gen2Ok, "F0");
         if (retGated)
-            Console.WriteLine($"median kept:\t{medRet,9:F2} MB\tbudget {spec.MaxRetainedMb,8:F2} MB\t{(retOk ? "PASS" : "FAIL")}   (still reachable after a full GC)");
+            Print("median kept", medRet, spec.MaxRetainedMb, "MB", retOk, note: "still reachable after a full GC");
         var extraOk = true;
         if (Math.Abs(spec.MaxP99Ms - double.MaxValue) > 0)
         {
             double p99 = p99s.Count > 0 ? Median(p99s) : double.NaN, b = spec.MaxP99Ms * factor;
             var ok = p99 <= b; extraOk &= ok;
-            Console.WriteLine($"median p99  : {p99,9:F1} ms   budget {b,8:F1} ms   {(ok ? "PASS" : "FAIL")}");
+            Print("median p99", p99, b, "ms", ok, "F1");
+        }
+        if (Math.Abs(spec.MaxFirstRunMs - double.MaxValue) > 0)
+        {
+            double b = spec.MaxFirstRunMs * factor;
+            var ok = firstMs <= b; extraOk &= ok;
+            Print("first run", firstMs, b, "ms", ok, "F1", "cold: before any warm-up");
         }
         if (Math.Abs(spec.MaxCpuMs - double.MaxValue) > 0)
         {
             double cpu = Median(cpus), b = spec.MaxCpuMs * factor;
             var ok = cpu <= b; extraOk &= ok;
-            Console.WriteLine($"median cpu  : {cpu,9:F1} ms   budget {b,8:F1} ms   {(ok ? "PASS" : "FAIL")}   (CPU time across all threads)");
+            Print("median cpu", cpu, b, "ms", ok, "F1", "CPU time across all threads");
         }
         if (spec.MaxMetrics != null)
             foreach (var (name, max) in spec.MaxMetrics)
             {
                 var v = metricRuns.TryGetValue(name, out var list) ? Median(list) : double.NaN;
                 var ok = v <= max; extraOk &= ok;
-                Console.WriteLine($"metric {name} : {v,9:F0}      budget {max,8:F0}      {(ok ? "PASS" : "FAIL")}");
+                Print(name, v, max, "", ok, "F0");
             }
         var pass = timeOk && allocOk && gen2Ok && retOk && extraOk;
         Console.WriteLine(pass ? "\nRESULT: PASS" : "\nRESULT: over budget - keep profiling.");
         return pass ? 0 : 1;
     }
+
+    /// <summary>Prints one result row: the median value against its budget, and PASS/FAIL.</summary>
+    static void Print(string name, double value, double budget, string unit, bool ok, string format = "F2", string? note = null) =>
+        Row(name, value.ToString(format), budget.ToString(format), unit, ok ? "PASS" : "FAIL", note);
+
+    // The header and every result row go through here, so the columns always line up.
+    static void Row(string metric, string value, string budget, string unit, string result, string? note = null) =>
+        Console.WriteLine($"{metric,-14} {value,10} {budget,10}  {unit,-4} {result,-6}{(note is null ? "" : $"({note})")}".TrimEnd());
 
     /// <summary>
     /// --cold [--runs N]: no warm-up, no budgets. Prints every run so you can watch tiered JIT, OSR and dynamic PGO
@@ -247,7 +276,10 @@ public static class Lab
     // Set PERFLAB_NO_SCALE=1 to disable globally, or LabSpec.ScaleTime=false per exercise for workloads
     // whose time is a fixed wall-clock wait (Task.Delay/Thread.Sleep/a real connect), not CPU work: a
     // faster CPU doesn't shrink those, so this factor would otherwise scale their budget down wrongly.
-    const double ReferenceSpinMs = 85.0;
+    // ReferenceSpinMs is this machine's own measured spin time (best of 4, pinned to one core), rounded
+    // to 50 ms - the machine every exercise's MaxMedianMs/MaxP99Ms/MaxCpuMs is calibrated against. It
+    // isn't a "slow box"; it's just the fixed point everything else scales relative to.
+    const double ReferenceSpinMs = 50.0;
 
     private static double MachineFactor()
     {
@@ -261,6 +293,56 @@ public static class Lab
             best = Math.Min(best, Stopwatch.GetElapsedTime(t0).TotalMilliseconds);
         }
         return best / ReferenceSpinMs;
+    }
+
+    /// <summary>
+    /// --calibrate: prints this machine's own spin-loop time, so you can (re)set ReferenceSpinMs when the
+    /// reference machine changes. Pins to one core first - an unpinned process can get scheduled across cores
+    /// with different boost clocks, which adds run-to-run noise MachineFactor()'s normal best-of-4 doesn't
+    /// fully average out. Unlike MachineFactor(), this is a one-off diagnostic, so it affords a bigger sample.
+    /// </summary>
+    private static int RunCalibrate()
+    {
+        var pinned = TryPinToOneCore();
+        Console.WriteLine(pinned
+            ? "Pinned to one core for a stable reading."
+            : "Could not pin to one core (unsupported on this OS, or insufficient permissions) - reading may be noisier.");
+
+        Spin(); // warm up
+        var best = double.MaxValue;
+        const int samples = 8;
+        for (var i = 0; i < samples; i++)
+        {
+            var t0 = Stopwatch.GetTimestamp();
+            Sink = Spin();
+            var ms = Stopwatch.GetElapsedTime(t0).TotalMilliseconds;
+            best = Math.Min(best, ms);
+            Console.WriteLine($"run {i + 1,2}: {ms,8:F2} ms");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"best: {best:F2} ms");
+        Console.WriteLine($"Current ReferenceSpinMs is {ReferenceSpinMs:F1} ms (this machine's factor: {best / ReferenceSpinMs:F3}x).");
+        Console.WriteLine("To make THIS machine the new reference: set ReferenceSpinMs to the value above (rounded),");
+        Console.WriteLine("then rescale every exercise's MaxMedianMs/MaxP99Ms/MaxCpuMs by (new / old) to preserve");
+        Console.WriteLine("current pass/fail behaviour - don't just change the constant on its own.");
+        return 0;
+    }
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    private static bool TryPinToOneCore()
+    {
+#pragma warning disable CA1416 // guarded by try/catch; ProcessorAffinity throws PlatformNotSupportedException on macOS
+        try
+        {
+            Process.GetCurrentProcess().ProcessorAffinity = (IntPtr)1;
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+#pragma warning restore CA1416
     }
 
     private static long Sink;

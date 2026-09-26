@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\PerfLab.Harness\PerfLab.Harness.csproj" />
+    <!-- Same Program.cs (checksum + budgets) as the exercise: one source of truth. -->
+    <Compile Include="..\..\exercises\L07-03-works-on-my-laptop\Program.cs" Link="Program.cs" />
+    <!-- The pasted System.GC.DynamicAdaptationMode=0 line is gone: Server GC's default dynamic adaptation (DATAS)
+         sizes the heaps to what the app actually uses, on any core count. -->
+  </ItemGroup>
+</Project>

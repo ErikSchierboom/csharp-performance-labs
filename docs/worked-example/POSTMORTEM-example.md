@@ -1,7 +1,7 @@
 # Post-mortem
 
 You won't write one of these until Level 7, but here is the template completed for a small, real-shaped incident, so the format is familiar.
-(Fictional service; the defect is the one from L0-01.)
+(Fictional service; the defect is the one from L00-01.)
 
 ## Feed page slow for power users, 2026-09-20
 
@@ -34,4 +34,4 @@ Append + one `Reverse()`. Confirmed: p99 back to 95 ms; a 600k-item synthetic ac
 3. A code-review note: no `Insert(0, …)` on lists that can grow.
 
 #### Earlier exercise it resembles
-L1-02 (linear work inside a loop): the same "count x cost" shape.
+L01-02 (linear work inside a loop): the same "count x cost" shape.

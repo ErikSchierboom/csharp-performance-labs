@@ -2,7 +2,7 @@ using OrdersService;
 using PerfLab.Harness;
 
 return Lab.Run(new LabSpec(
-    Name: "L11-boss-orders-service: Orders service (final boss of Level 11)",
+    Name: "L11-boss-orders-service",
     Workload: Workload.Run,
     ExpectedChecksum: 80000241823,
     MaxMedianMs: 1146,

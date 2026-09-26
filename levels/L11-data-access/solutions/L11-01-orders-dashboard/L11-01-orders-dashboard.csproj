@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\PerfLab.Harness\PerfLab.Harness.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.0" />
+    <!-- Same Program.cs (checksum + budgets) as the exercise: one source of truth. -->
+    <Compile Include="..\..\exercises\L11-01-orders-dashboard\Program.cs" Link="Program.cs" />
+    <ProjectReference Include="..\..\..\..\src\PerfLab.Harness.Web\PerfLab.Harness.Web.csproj" />
+  </ItemGroup>
+</Project>

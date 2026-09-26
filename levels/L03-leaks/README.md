@@ -11,18 +11,18 @@ Run one: `dotnet run -c Release --project levels/L03-leaks/exercises/<id>` (expe
 **Further reading:** [Level 3 reading list](../../docs/READING-LIST.md#level-3-leaks-retention)
 
 ## Exercises
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L3-01-event-hub](exercises/L3-01-event-hub/README.md) | Event hub | [solution](solutions/L3-01-event-hub/SOLUTION.md) |
-| [L3-02-session-cache](exercises/L3-02-session-cache/README.md) | Session cache | [solution](solutions/L3-02-session-cache/SOLUTION.md) |
-| [L3-03-price-ticker](exercises/L3-03-price-ticker/README.md) | Price ticker | [solution](solutions/L3-03-price-ticker/SOLUTION.md) |
-| [L3-04-batch-report](exercises/L3-04-batch-report/README.md) | Batch report (a leak that isn't) | [solution](solutions/L3-04-batch-report/SOLUTION.md) |
-| [L3-05-tag-registry](exercises/L3-05-tag-registry/README.md) | Tag registry | [solution](solutions/L3-05-tag-registry/SOLUTION.md) |
-| [L3-06-callback-registry](exercises/L3-06-callback-registry/README.md) | Callback registry (closures capture more than you think) | [solution](solutions/L3-06-callback-registry/SOLUTION.md) |
+| [L03-01-event-hub](exercises/L03-01-event-hub/README.md) | Event hub | [solution](solutions/L03-01-event-hub/SOLUTION.md) |
+| [L03-02-session-cache](exercises/L03-02-session-cache/README.md) | Session cache | [solution](solutions/L03-02-session-cache/SOLUTION.md) |
+| [L03-03-price-ticker](exercises/L03-03-price-ticker/README.md) | Price ticker | [solution](solutions/L03-03-price-ticker/SOLUTION.md) |
+| [L03-04-batch-report](exercises/L03-04-batch-report/README.md) | Batch report | [solution](solutions/L03-04-batch-report/SOLUTION.md) |
+| [L03-05-tag-registry](exercises/L03-05-tag-registry/README.md) | Tag registry | [solution](solutions/L03-05-tag-registry/SOLUTION.md) |
+| [L03-06-callback-registry](exercises/L03-06-callback-registry/README.md) | Callback registry | [solution](solutions/L03-06-callback-registry/SOLUTION.md) |
 
 ## Final boss fight
 A disguised combination of this level's defects: no per-defect hints. Do it last, then write down which exercise each defect came from.
 
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L3-boss-session-gateway](exercises/L3-boss-session-gateway/README.md) | Session gateway (final boss of Level 3) | [solution](solutions/L3-boss-session-gateway/SOLUTION.md) |
+| [L03-boss-session-gateway](exercises/L03-boss-session-gateway/README.md) | Session gateway | [solution](solutions/L03-boss-session-gateway/SOLUTION.md) |

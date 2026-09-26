@@ -11,7 +11,7 @@ Run one: `dotnet run -c Release --project levels/L00-start-here/exercises/<id>` 
 **Further reading:** [Level 0 reading list](../../docs/READING-LIST.md#level-0-foundations)
 
 ## Exercises
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L0-01-activity-feed](exercises/L0-01-activity-feed/README.md) | Activity feed  (the worked example) | [solution](solutions/L0-01-activity-feed/SOLUTION.md) |
+| [L00-01-activity-feed](exercises/L00-01-activity-feed/README.md) | Activity feed  (the worked example) | [solution](solutions/L00-01-activity-feed/SOLUTION.md) |
 

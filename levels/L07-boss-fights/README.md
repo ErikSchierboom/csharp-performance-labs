@@ -11,10 +11,10 @@ Run one: `dotnet run -c Release --project levels/L07-boss-fights/exercises/<id>`
 **Further reading:** [Level 7 reading list](../../docs/READING-LIST.md#level-7-boss-fights)
 
 ## Exercises
-| Exercise | Topic | Spoiler |
+| Exercise | Scenario | Spoiler |
 |---|---|---|
-| [L7-01-checkout-service](exercises/L7-01-checkout-service/README.md) | Checkout service | [solution](solutions/L7-01-checkout-service/SOLUTION.md) |
-| [L7-02-phantom-leak](exercises/L7-02-phantom-leak/README.md) | Phantom leak (native memory) | [solution](solutions/L7-02-phantom-leak/SOLUTION.md) |
-| [L7-03-works-on-my-laptop](exercises/L7-03-works-on-my-laptop/README.md) | Works on my laptop (GC configuration) | [solution](solutions/L7-03-works-on-my-laptop/SOLUTION.md) |
-| [L7-04-observer-effect](exercises/L7-04-observer-effect/README.md) | Observer effect | [solution](solutions/L7-04-observer-effect/SOLUTION.md) |
+| [L07-01-checkout-service](exercises/L07-01-checkout-service/README.md) | Checkout service | [solution](solutions/L07-01-checkout-service/SOLUTION.md) |
+| [L07-02-phantom-leak](exercises/L07-02-phantom-leak/README.md) | Phantom leak | [solution](solutions/L07-02-phantom-leak/SOLUTION.md) |
+| [L07-03-works-on-my-laptop](exercises/L07-03-works-on-my-laptop/README.md) | Works on my laptop | [solution](solutions/L07-03-works-on-my-laptop/SOLUTION.md) |
+| [L07-04-whodunit](exercises/L07-04-whodunit/README.md) | Whodunit | [solution](solutions/L07-04-whodunit/SOLUTION.md) |
 

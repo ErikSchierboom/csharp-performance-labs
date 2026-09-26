@@ -1,4 +1,4 @@
-#!/bin/pwsh
+#!/usr/bin/env pwsh
 <#
 .SYNOPSIS
 Builds the docs site (MkDocs). Creates/reuses a local venv, so the first run is
@@ -18,19 +18,23 @@ param(
 $ErrorActionPreference = "Stop"
 Set-Location $PSScriptRoot
 
-$venvPython = Join-Path $PSScriptRoot ".venv-docs\Scripts\python.exe"
+$venvDir = Join-Path $PSScriptRoot ".venv-docs"
+# A venv puts its interpreter in Scripts\python.exe on Windows and bin/python elsewhere.
+# ($IsWindows doesn't exist in Windows PowerShell 5.1, hence the PSEdition check.)
+$onWindows = $IsWindows -or $PSVersionTable.PSEdition -eq "Desktop"
+$venvPython = if ($onWindows) { Join-Path $venvDir "Scripts/python.exe" } else { Join-Path $venvDir "bin/python" }
 
 if (-not (Test-Path $venvPython)) {
     Write-Host "Creating docs venv at .venv-docs ..."
-    # Prefer the "py" launcher: plain "python" can resolve to the Microsoft
+    # On Windows prefer the "py" launcher: plain "python" can resolve to the Microsoft
     # Store alias stub, which exists as a command but doesn't run Python.
-    if (Get-Command py -ErrorAction SilentlyContinue) {
-        py -m venv "$PSScriptRoot\.venv-docs"
-    } else {
-        python -m venv "$PSScriptRoot\.venv-docs"
-    }
+    # On Linux/macOS the interpreter is usually "python3"; "python" may not exist.
+    $candidates = if ($onWindows) { "py", "python" } else { "python3", "python" }
+    $python = $candidates | Where-Object { Get-Command $_ -ErrorAction SilentlyContinue } | Select-Object -First 1
+    if (-not $python) { throw "Couldn't find Python ($($candidates -join ' or ')). Make sure Python 3 is installed and on PATH." }
+    & $python -m venv $venvDir
     if (-not (Test-Path $venvPython)) {
-        throw "Couldn't create the venv. Make sure Python 3 is installed and on PATH."
+        throw "Couldn't create the venv. Make sure Python 3 is installed and on PATH (on Debian/Ubuntu you may need the python3-venv package)."
     }
 }
 
