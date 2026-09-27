@@ -9,7 +9,7 @@ return Lab.Run(new LabSpec(
     MaxAllocatedMb: 7,
     ScaleTime: false,
     MaxP99Ms: 100,
-    MaxMetrics: new() { ["peakInflight"] = 40 },
+    MaxMetrics: new() { [Metrics.PeakInFlight] = 40 },
     WarmupRuns: 1,
     MeasuredRuns: 3,
     Reset: Workload.Reset,

@@ -10,10 +10,9 @@ Same result (checksum), and:
 
 | Budget | Value |
 |---|---|
-| Median time | 163 ref-ms |
-| Median allocated | 166 MB |
-| Median p99 latency | 9 ref-ms |
-| Kept after a full GC | ≤ 1 MB |
+| Median time | 60 ref-ms |
+| Median allocated | 70 MB |
+| Median p99 latency | 5 ref-ms |
+| Kept after a full GC | 0 MB |
 
-## Note (the ASP.NET Core levels (9–14) harness)
-The exercise runs an ASP.NET Core server on loopback **inside the harness process** (`WebRig`) and drives it with virtual users. Databases are in-memory SQLite, seeded once. Allocation and CPU include the small constant client cost.
+> The exercise runs an ASP.NET Core server on loopback **inside the harness process** (`WebRig`) and drives it with virtual users. Databases are in-memory SQLite, seeded once. Allocation and CPU include the small constant client cost.

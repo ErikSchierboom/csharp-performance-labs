@@ -10,13 +10,10 @@ Same result (checksum), and:
 
 | Budget | Value |
 |---|---|
-| Median time | 1146 ref-ms |
-| Median allocated | 73 MB |
-| Median p99 latency | 108 ref-ms |
-| sqlCommands | ≤ 1801 |
-
-## Note (harness)
-An ASP.NET Core server runs on loopback **inside the harness process** (`WebRig`). Allocation and CPU include the small constant client cost.
+| Median time | 350 ref-ms |
+| Median allocated | 35 MB |
+| Median p99 latency | 40 ref-ms |
+| sqlCommands | ≤ 3 |
 
 ## Final boss fight
 The **final boss** of its level: a disguised combination of that level's defects with **no per-defect hints**. Profile, list what you find, fix one thing at a time, and afterwards write down **which exercise each defect came from** (the solution lists them). Passing means hitting *all* the budgets.

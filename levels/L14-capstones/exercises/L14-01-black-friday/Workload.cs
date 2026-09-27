@@ -46,5 +46,5 @@ public static class Workload
 
     public static void Reset() { _cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions()); _map.Clear(); }   // scaffolding
 
-    public static long Run() { External.Calls = 0; External.GiveUps = 0; var r = Rig.Drive(users: 60, total: 600, i => "/product/" + i % 30); Lab.Report("externalCalls", External.Calls); Lab.Report("giveUps", External.GiveUps); return r; }
+    public static long Run() { External.Calls = 0; External.GiveUps = 0; var r = Rig.Drive(users: 60, total: 600, i => "/product/" + i % 30); Lab.Report(Metrics.ExternalCalls, External.Calls); Lab.Report(Metrics.GiveUps, External.GiveUps); return r; }
 }

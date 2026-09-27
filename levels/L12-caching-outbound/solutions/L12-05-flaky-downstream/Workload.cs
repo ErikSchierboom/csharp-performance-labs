@@ -34,5 +34,5 @@ public static class Workload
 
     public static void Reset() {  }   // scaffolding
 
-    public static long Run() { Downstream.Calls = 0; Downstream.GiveUps = 0; var r = Rig.Drive(users: 80, total: 400, i => "/quote/" + i); Lab.Report("downstreamCalls", Downstream.Calls); Lab.Report("giveUps", Downstream.GiveUps); return r; }
+    public static long Run() { Downstream.Calls = 0; Downstream.GiveUps = 0; var r = Rig.Drive(users: 80, total: 400, i => "/quote/" + i); Lab.Report(Metrics.DownstreamCalls, Downstream.Calls); Lab.Report(Metrics.GiveUps, Downstream.GiveUps); return r; }
 }

@@ -21,5 +21,5 @@ public static class Workload
 
     public static void Reset() { lock (Ports) Ports.Clear(); }   // scaffolding
 
-    public static long Run() { lock (Ports) Ports.Clear(); var r = Rig.Drive(users: 16, total: 400, i => "/api/" + i); lock (Ports) Lab.Report("connections", Ports.Count); return r; }
+    public static long Run() { lock (Ports) Ports.Clear(); var r = Rig.Drive(users: 16, total: 400, i => "/api/" + i); lock (Ports) Lab.Report(Metrics.Connections, Ports.Count); return r; }
 }

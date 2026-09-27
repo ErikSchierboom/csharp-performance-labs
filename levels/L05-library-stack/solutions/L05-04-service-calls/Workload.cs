@@ -52,7 +52,7 @@ public static class Workload
         long total = 0;
         for (var i = 0; i < 300; i++)
             total += Shared.GetStringAsync(LocalServer.Url).GetAwaiter().GetResult().Length;
-        Lab.Report("connections", LocalServer.Connections);
+        Lab.Report(Metrics.Connections, LocalServer.Connections);
         return total;
     }
 }

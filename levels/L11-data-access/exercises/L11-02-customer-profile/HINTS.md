@@ -2,7 +2,7 @@
 
 <details><summary>Hint 1: which tool?</summary>
 
-EF command logging shows one query with two `LEFT JOIN`s; the row count returned is the tell. dotMemory: many duplicated materialised values.
+EF command logging shows one query with two `LEFT JOIN`s; the harness's `rowsPerRequest` metric is the tell (it counts rows as `DbDataReader.Read()` returns them, before EF folds duplicates back into distinct entities). dotMemory: many duplicated materialised values.
 </details>
 
 <details><summary>Hint 2: where?</summary>

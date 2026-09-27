@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using PerfLab.Harness;
 using PerfLab.Harness.Web;
-using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
+using PerfLab.Harness.Data;
 
 namespace OrdersDashboard;
 
@@ -19,14 +18,6 @@ public class ShopContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<Address> Addresses => Set<Address>();
-}
-public sealed class CommandCounter : DbCommandInterceptor
-{
-    public static int Count;
-    public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand c, CommandEventData e, InterceptionResult<DbDataReader> r) { Interlocked.Increment(ref Count); return r; }
-    public override InterceptionResult<int> NonQueryExecuting(DbCommand c, CommandEventData e, InterceptionResult<int> r) { Interlocked.Increment(ref Count); return r; }
-    public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand c, CommandEventData e, InterceptionResult<DbDataReader> r, CancellationToken ct = default) { Interlocked.Increment(ref Count); return new(r); }
-    public override ValueTask<InterceptionResult<int>> NonQueryExecutingAsync(DbCommand c, CommandEventData e, InterceptionResult<int> r, CancellationToken ct = default) { Interlocked.Increment(ref Count); return new(r); }
 }
 public static class Db
 {
@@ -55,13 +46,16 @@ public static class Workload
 {
     static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/totals/{start:int}", async (int start) =>
     {
-        using var ctx = Db.Create();
+        await using var ctx = Db.Create();
         var totals = await ctx.Customers.AsNoTracking().Where(c => c.Id >= start && c.Id < start + 20)
             .Select(c => c.Orders.Sum(o => o.Cents)).ToListAsync();                                    // one query
         return totals.Sum(t => (long)t).ToString();
     }));
 
-    public static void Reset() {  }   // scaffolding
-
-    public static long Run() { CommandCounter.Count = 0; var r = Rig.Drive(users: 16, total: 400, i => "/totals/" + (1 + i % 380)); Lab.Report("sqlCommands", CommandCounter.Count); return r; }
+    public static long Run() { 
+        CommandCounter.Reset();
+        var r = Rig.Drive(users: 16, total: 400, i => "/totals/" + (1 + i % 380));
+        Lab.Report(DbMetrics.CommandsPerRequest, CommandCounter.Total); 
+        return r;
+    }
 }

@@ -142,6 +142,7 @@
     <Project Path="levels/L14-capstones/exercises/L14-02-oom-killed/L14-02-oom-killed.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/PerfLab.Harness.Data/PerfLab.Harness.Data.csproj" />
     <Project Path="src/PerfLab.Harness.Web/PerfLab.Harness.Web.csproj" />
     <Project Path="src/PerfLab.Harness/PerfLab.Harness.csproj" />
   </Folder>

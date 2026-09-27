@@ -226,12 +226,12 @@ public static class Lab
     }
 
     /// <summary>Prints one result row: the median value against its budget, and PASS/FAIL.</summary>
-    static void Print(string name, double value, double budget, string unit, bool ok, string format = "F2", string? note = null) =>
+    private static void Print(string name, double value, double budget, string unit, bool ok, string format = "F2", string? note = null) =>
         Row(name, value.ToString(format), budget.ToString(format), unit, ok ? "PASS" : "FAIL", note);
 
     // The header and every result row go through here, so the columns always line up.
-    static void Row(string metric, string value, string budget, string unit, string result, string? note = null) =>
-        Console.WriteLine($"{metric,-14} {value,10} {budget,10}  {unit,-4} {result,-6}{(note is null ? "" : $"({note})")}".TrimEnd());
+    private static void Row(string metric, string value, string budget, string unit, string result, string? note = null) =>
+        Console.WriteLine($"{metric,-20} {value,10} {budget,10}  {unit,-4} {result,-6}{(note is null ? "" : $"({note})")}".TrimEnd());
 
     /// <summary>
     /// --cold [--runs N]: no warm-up, no budgets. Prints every run so you can watch tiered JIT, OSR and dynamic PGO

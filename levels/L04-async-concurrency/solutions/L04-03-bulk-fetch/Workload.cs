@@ -33,7 +33,7 @@ public static class Workload
         Parallel.ForEachAsync(items, new ParallelOptions { MaxDegreeOfParallelism = 50 },
             async (i, ct) => results[i] = await downstream.CallAsync(i)).GetAwaiter().GetResult();
 
-        Lab.Report("peakInflight", downstream.Peak);
+        Lab.Report(Metrics.PeakInFlight, downstream.Peak);
         return results.Sum(r => (long)r);
     }
 }

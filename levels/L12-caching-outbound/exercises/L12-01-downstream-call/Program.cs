@@ -9,6 +9,6 @@ return Lab.Run(new LabSpec(
     MaxAllocatedMb: 6,
     ScaleTime: false,
     MaxP99Ms: 6,
-    MaxMetrics: new() { ["connections"] = 25 },
+    MaxMetrics: new() { [Metrics.Connections] = 25 },
     Reset: Workload.Reset,
     TimedWarmup: false), args);

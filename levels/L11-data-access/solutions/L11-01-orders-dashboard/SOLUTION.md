@@ -1,10 +1,5 @@
 # L11-01 - Solution
 
-## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
-- **Metric:** `sqlCommands` ≈ 21 per request (slow) vs 1 (fix).
-
 ## Root cause
 A per-customer query inside a loop: N+1 on the request path, multiplying database work by the fan-out.
 

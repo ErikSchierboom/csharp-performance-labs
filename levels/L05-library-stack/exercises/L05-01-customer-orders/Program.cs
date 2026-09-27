@@ -1,5 +1,6 @@
 using CustomerOrders;
 using PerfLab.Harness;
+using PerfLab.Harness.Data;
 
 return Lab.Run(new LabSpec(
     Name: "L05-01-customer-orders",
@@ -7,4 +8,4 @@ return Lab.Run(new LabSpec(
     ExpectedChecksum: 20776276,
     MaxMedianMs: 2,
     MaxAllocatedMb: 1,
-    MaxMetrics: new() { ["sqlCommands"] = 1 }), args);
+    MaxMetrics: new() { [DbMetrics.CommandsPerRequest] = 1 }), args);

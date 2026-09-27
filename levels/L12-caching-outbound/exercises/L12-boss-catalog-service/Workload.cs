@@ -39,7 +39,7 @@ public static class Workload
     {
         lock (Ports) Ports.Clear();
         var r = Rig.Drive(users: 32, total: 1_500, i => "/product/" + (i % 6 == 0 ? 1_000 + i : i % 60));
-        lock (Ports) Lab.Report("connections", Ports.Count);
+        lock (Ports) Lab.Report(Metrics.Connections, Ports.Count);
         return r;
     }
 }

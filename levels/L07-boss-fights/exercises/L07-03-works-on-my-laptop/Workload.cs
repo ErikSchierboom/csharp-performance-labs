@@ -22,8 +22,8 @@ public static class Workload
 
         var info = GC.GetGCMemoryInfo();
         using var p = Process.GetCurrentProcess();
-        Lab.Report("committedMB", info.TotalCommittedBytes / 1024f / 1024);
-        Lab.Report("workingSetMB", p.WorkingSet64 / 1024f / 1024);
+        Lab.Report(Metrics.CommittedMb, info.TotalCommittedBytes / 1024f / 1024);
+        Lab.Report(Metrics.WorkingSetMb, p.WorkingSet64 / 1024f / 1024);
         return total;
     }
 }

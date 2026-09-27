@@ -7,5 +7,5 @@ return Lab.Run(new LabSpec(
     ExpectedChecksum: 1200,
     MaxMedianMs: 20,
     MaxAllocatedMb: 4,
-    MaxMetrics: new() { ["connections"] = 5 },
+    MaxMetrics: new() { [Metrics.Connections] = 5 },
     Reset: Workload.Reset), args);

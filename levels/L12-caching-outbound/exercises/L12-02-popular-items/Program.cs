@@ -9,6 +9,6 @@ return Lab.Run(new LabSpec(
     MaxAllocatedMb: 2,
     ScaleTime: false,
     MaxP99Ms: 204,
-    MaxMetrics: new() { ["loads"] = 9 },
+    MaxMetrics: new() { [Metrics.Loads] = 9 },
     Reset: Workload.Reset,
     TimedWarmup: false), args);

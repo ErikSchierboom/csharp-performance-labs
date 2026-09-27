@@ -1,7 +1,6 @@
 # L11-03 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
 
 - **Pool:** 8/8 in use, many waiters; each connection spends ~97% of its hold time idle, waiting on the third party.
 

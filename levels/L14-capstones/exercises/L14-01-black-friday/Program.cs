@@ -9,6 +9,6 @@ return Lab.Run(new LabSpec(
     MaxAllocatedMb: 5,
     ScaleTime: false,
     MaxP99Ms: 235,
-    MaxMetrics: new() { ["externalCalls"] = 46, ["giveUps"] = 1 },
+    MaxMetrics: new() { [Metrics.ExternalCalls] = 46, [Metrics.GiveUps] = 1 },
     Reset: Workload.Reset,
     TimedWarmup: false), args);

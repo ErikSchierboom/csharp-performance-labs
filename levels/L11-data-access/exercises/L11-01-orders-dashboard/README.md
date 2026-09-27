@@ -15,5 +15,4 @@ Same result (checksum), and:
 | Median p99 latency | 12 ref-ms |
 | sqlCommands | ≤ 601 |
 
-## Note (the ASP.NET Core levels (9–14) harness)
-The exercise runs an ASP.NET Core server on loopback **inside the harness process** (`WebRig`) and drives it with virtual users. Databases are in-memory SQLite, seeded once. Allocation and CPU include the small constant client cost.
+> The exercise runs an ASP.NET Core server on loopback **inside the harness process** (`WebRig`) and drives it with virtual users. Databases are in-memory SQLite, seeded once. Allocation and CPU include the small constant client cost.

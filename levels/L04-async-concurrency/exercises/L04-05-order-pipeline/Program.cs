@@ -7,4 +7,4 @@ return Lab.Run(new LabSpec(
     ExpectedChecksum: 3742140,
     MaxMedianMs: 300,
     MaxAllocatedMb: 300,
-    MaxMetrics: new() { ["maxQueued"] = 50, ["peakHeapMb"] = 12 }), args);
+    MaxMetrics: new() { [Metrics.MaxQueued] = 50, [Metrics.PeakHeapMb] = 12 }), args);

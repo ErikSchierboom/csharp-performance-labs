@@ -9,7 +9,7 @@ return Lab.Run(new LabSpec(
     MaxAllocatedMb: 3,
     ScaleTime: false,
     MaxP99Ms: 5,
-    MaxMetrics: new() { ["peakJobs"] = 5 },
+    MaxMetrics: new() { [Metrics.PeakJobs] = 5 },
     WarmupRuns: 1,
     MeasuredRuns: 3,
     Reset: Workload.Reset,

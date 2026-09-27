@@ -64,7 +64,7 @@ public static class Workload
             {
                 var n = new byte[5_000]; n[0] = (byte)(i % 100);
                 await queue.Writer.WriteAsync(n);
-                Lab.Report("maxQueued", queue.Reader.Count);
+                Lab.Report(Metrics.MaxQueued, queue.Reader.Count);
             }
             queue.Writer.Complete();
         }).GetAwaiter().GetResult();

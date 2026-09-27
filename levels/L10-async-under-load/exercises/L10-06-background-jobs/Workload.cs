@@ -29,6 +29,6 @@ public static class Workload
 
     public static long Run() { var r = Rig.Drive(users: 100, total: 300, i => "/enqueue/" + i, HttpMethod.Post);
         SpinWait.SpinUntil(() => Volatile.Read(ref _done) >= 300, 60_000); // wait for the background jobs to finish
-        Lab.Report("peakJobs", Volatile.Read(ref _peak));
+        Lab.Report(Metrics.PeakJobs, Volatile.Read(ref _peak));
         return r; }
 }

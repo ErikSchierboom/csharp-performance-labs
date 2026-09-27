@@ -21,5 +21,5 @@ public static class Workload
 
     public static void Reset() { _cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions()); _map.Clear(); }   // scaffolding
 
-    public static long Run() { Interlocked.Exchange(ref _loads, 0); var r = Rig.Drive(users: 40, total: 200, i => "/item/" + i % 5); Lab.Report("loads", Volatile.Read(ref _loads)); return r; }
+    public static long Run() { Interlocked.Exchange(ref _loads, 0); var r = Rig.Drive(users: 40, total: 200, i => "/item/" + i % 5); Lab.Report(Metrics.Loads, Volatile.Read(ref _loads)); return r; }
 }

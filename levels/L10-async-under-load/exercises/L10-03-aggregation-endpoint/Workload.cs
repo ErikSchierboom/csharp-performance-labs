@@ -37,5 +37,10 @@ public static class Workload
 
     public static void Reset() { ThreadPool.SetMinThreads(4, 4); }   // scaffolding
 
-    public static long Run() { var r = Rig.Drive(users: 16, total: 160, i => "/aggregate/" + i); Lab.Report("peakInflight", Down.Peak); return r; }
+    public static long Run()
+    {
+        var r = Rig.Drive(users: 16, total: 160, i => "/aggregate/" + i); 
+        Lab.Report(Metrics.PeakInFlight, Down.Peak); 
+        return r;
+    }
 }

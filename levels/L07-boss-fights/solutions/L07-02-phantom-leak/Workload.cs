@@ -43,7 +43,7 @@ public static class Workload
             buffer.Fill(i);
             checksum += buffer.Sample();
         }
-        Lab.Report("privateMB", Math.Max(0, PrivateBytes() - before) / 1024f / 1024f);
+        Lab.Report(Metrics.PrivateMb, Math.Max(0, PrivateBytes() - before) / 1024f / 1024f);
         return checksum;
     }
 }

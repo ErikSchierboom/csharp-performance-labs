@@ -8,4 +8,4 @@ return Lab.Run(new LabSpec(
     MaxMedianMs: 150,
     MaxAllocatedMb: 1,
     ScaleTime: false,
-    MaxMetrics: new() { ["peakInflight"] = 50 }), args);
+    MaxMetrics: new() { [Metrics.PeakInFlight] = 50 }), args);

@@ -13,7 +13,7 @@ public static class Workload
 
     private static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/slow/{id:int}", async (int id, HttpContext ctx) =>
     {
-        Lab.Report("peakInFlight", Interlocked.Increment(ref _inFlight)); // requests inside the handler, queued or working
+        Lab.Report(Metrics.PeakInFlight, Interlocked.Increment(ref _inFlight)); // requests inside the handler, queued or working
         try
         {
             await Capacity.WaitAsync();
@@ -36,6 +36,6 @@ public static class Workload
     // 100 requests from 20 users. Every 4th client is patient and waits for its answer; the rest give up after 30 ms.
     public static long Run() { var r = Rig.DriveAbandon(users: 20, total: 100, i => "/slow/" + i, i => i % 4 == 0 ? 0 : 30);
         while (Volatile.Read(ref _inFlight) > 0) Thread.Sleep(10); // wait until the server is idle again
-        Lab.Report("stepsAfterAbort", Volatile.Read(ref _stepsAfterAbort));
+        Lab.Report(Metrics.StepsAfterAbort, Volatile.Read(ref _stepsAfterAbort));
         return r; }
 }

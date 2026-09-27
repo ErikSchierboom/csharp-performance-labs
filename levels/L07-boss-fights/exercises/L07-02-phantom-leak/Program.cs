@@ -8,5 +8,5 @@ return Lab.Run(new LabSpec(
     MaxMedianMs: 50,
     MaxAllocatedMb: 1,
     MaxRetainedMb: 0,
-    MaxMetrics: new() { ["privateMB"] = 0 },
+    MaxMetrics: new() { [Metrics.PrivateMb] = 0 },
     TimedWarmup: false), args);

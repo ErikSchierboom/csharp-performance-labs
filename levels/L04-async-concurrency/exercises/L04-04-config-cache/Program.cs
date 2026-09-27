@@ -8,4 +8,4 @@ return Lab.Run(new LabSpec(
     MaxMedianMs: 120,
     MaxAllocatedMb: 1,
     MaxCpuMs: 120,
-    MaxMetrics: new() { ["factoryCalls"] = 20 }), args);
+    MaxMetrics: new() { [Metrics.FactoryCalls] = 20 }), args);

@@ -30,7 +30,7 @@ public static class Workload
 
         var results = Task.WhenAll(items.Select(downstream.CallAsync)).GetAwaiter().GetResult();   // all at once
 
-        Lab.Report("peakInflight", downstream.Peak);
+        Lab.Report(Metrics.PeakInFlight, downstream.Peak);
         return results.Sum(r => (long)r);
     }
 }

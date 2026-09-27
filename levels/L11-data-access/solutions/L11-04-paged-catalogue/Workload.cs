@@ -9,12 +9,16 @@ using Microsoft.EntityFrameworkCore;
 namespace PagedCatalogue;
 
 public class Product { public int Id { get; set; } public string Name { get; set; } = ""; public string Description { get; set; } = ""; }
-public class CatalogContext : DbContext { public CatalogContext(DbContextOptions<CatalogContext> o) : base(o) { } public DbSet<Product> Products => Set<Product>(); }
+public class CatalogContext(DbContextOptions<CatalogContext> o) : DbContext(o)
+{
+    public DbSet<Product> Products => Set<Product>(); 
+}
+
 public static class Db
 {
-    static readonly string DbFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "perflab-" + Environment.ProcessId + "-" + Guid.NewGuid().ToString("N") + ".db");
-    static readonly string ConnStr = "Data Source=" + DbFile;
-    static readonly DbContextOptions<CatalogContext> Options;
+    private static readonly string DbFile = Path.Combine(Path.GetTempPath(), "perflab-" + Environment.ProcessId + "-" + Guid.NewGuid().ToString("N") + ".db");
+    private static readonly string ConnStr = "Data Source=" + DbFile;
+    private static readonly DbContextOptions<CatalogContext> Options;
     static Db()
     {
         AppDomain.CurrentDomain.ProcessExit += (_, _) => { SqliteConnection.ClearAllPools(); foreach (var f in Directory.GetFiles(System.IO.Path.GetDirectoryName(DbFile)!, System.IO.Path.GetFileName(DbFile) + "*")) File.Delete(f); }; Options = new DbContextOptionsBuilder<CatalogContext>().UseSqlite(ConnStr).Options;
@@ -32,13 +36,13 @@ public static class Workload
     {
         app.MapGet("/products/{n:int}", async (int n) =>
         {
-            using var ctx = Db.Create();                                     // a short-lived context per request (pooled by EF if you use AddDbContextPool)
+            await using var ctx = Db.Create();
             var page = await ctx.Products.AsNoTracking().Where(p => p.Id > n * 50 && p.Id <= n * 50 + 50).ToListAsync();
             return page.Count.ToString();
         });
     });
-
-    public static void Reset() {  }   // scaffolding
-
+    
+    public static void Reset() { } // no op
+    
     public static long Run() { return Rig.Drive(users: 8, total: 400, i => "/products/" + i); }
 }

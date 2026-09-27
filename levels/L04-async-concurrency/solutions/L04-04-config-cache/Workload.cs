@@ -30,7 +30,7 @@ public static class Workload
                 Interlocked.Add(ref total, v);
             });
         }
-        Lab.Report("factoryCalls", _calls);
+        Lab.Report(Metrics.FactoryCalls, _calls);
         return total;
     }
 }

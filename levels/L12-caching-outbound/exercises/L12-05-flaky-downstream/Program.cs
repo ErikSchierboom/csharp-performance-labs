@@ -9,4 +9,4 @@ return Lab.Run(new LabSpec(
     MaxAllocatedMb: 4,
     ScaleTime: false,
     MaxP99Ms: 724,
-    MaxMetrics: new() { ["downstreamCalls"] = 601, ["giveUps"] = 1 }), args);
+    MaxMetrics: new() { [Metrics.DownstreamCalls] = 601, [Metrics.GiveUps] = 1 }), args);

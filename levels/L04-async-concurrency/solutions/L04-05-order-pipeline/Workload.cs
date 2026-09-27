@@ -27,8 +27,8 @@ public static class Workload
                 var order = new byte[10_000];
                 order[0] = (byte)(i % 251);
                 await channel.Writer.WriteAsync(order);
-                Lab.Report("maxQueued", channel.Reader.Count);
-                Lab.Report("peakHeapMb", GC.GetTotalMemory(false) / 1_048_576.0);
+                Lab.Report(Metrics.MaxQueued, channel.Reader.Count);
+                Lab.Report(Metrics.PeakHeapMb, GC.GetTotalMemory(false) / 1_048_576.0);
             }
             channel.Writer.Complete();
         }).GetAwaiter().GetResult();

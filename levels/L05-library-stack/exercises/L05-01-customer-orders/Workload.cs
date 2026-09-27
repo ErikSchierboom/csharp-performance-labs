@@ -1,8 +1,7 @@
-using System.Data.Common;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using PerfLab.Harness;
+using PerfLab.Harness.Data;
 
 namespace CustomerOrders;
 
@@ -13,13 +12,6 @@ public sealed class ShopContext(DbContextOptions<ShopContext> options) : DbConte
 {
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Order> Orders => Set<Order>();
-}
-
-public sealed class CommandCounter : DbCommandInterceptor
-{
-    public static int Count;
-    public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result)
-    { Interlocked.Increment(ref Count); return result; }
 }
 
 public static class Db
@@ -50,7 +42,7 @@ public static class Workload
 {
     public static long Run()
     {
-        CommandCounter.Count = 0;
+        CommandCounter.Reset();
         using var ctx = Db.Create();
         long checksum = 0;
         var customers = ctx.Customers.ToList();
@@ -59,7 +51,7 @@ public static class Workload
             var orders = ctx.Orders.Where(o => o.CustomerId == c.Id).ToList();
             checksum += c.Id * 7L + orders.Sum(o => (long)o.Cents);
         }
-        Lab.Report("sqlCommands", CommandCounter.Count);
+        Lab.Report(DbMetrics.CommandsPerRequest, CommandCounter.Total);
         return checksum;
     }
 }

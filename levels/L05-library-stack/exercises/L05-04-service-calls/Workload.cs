@@ -53,7 +53,7 @@ public static class Workload
             using var client = new HttpClient();
             total += client.GetStringAsync(LocalServer.Url).GetAwaiter().GetResult().Length;
         }
-        Lab.Report("connections", LocalServer.Connections);
+        Lab.Report(Metrics.Connections, LocalServer.Connections);
         return total;
     }
 }

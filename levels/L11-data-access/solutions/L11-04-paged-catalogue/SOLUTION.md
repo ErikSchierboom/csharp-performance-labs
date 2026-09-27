@@ -1,7 +1,6 @@
 # L11-04 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
 
 - **Retained memory:** thousands of `Product` + snapshots + strings, rooted from the static context's change tracker.
 

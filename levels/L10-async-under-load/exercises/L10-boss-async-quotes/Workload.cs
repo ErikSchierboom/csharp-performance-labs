@@ -59,5 +59,10 @@ public static class Workload
 
     public static void Reset() { ThreadPool.SetMinThreads(4, 4); ThreadPool.SetMaxThreads(32, 32); }   // scaffolding
 
-    public static long Run() { var r = Rig.Drive(users: 100, total: 400, i => "/quote/" + i); Lab.Report("peakInflight", Down.Peak); return r; }
+    public static long Run()
+    {
+        var r = Rig.Drive(users: 100, total: 400, i => "/quote/" + i); 
+        Lab.Report(Metrics.PeakInFlight, Down.Peak); 
+        return r;
+    }
 }
