@@ -1,10 +1,5 @@
 # L13-01 - Solution
 
-## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
-- **Metric:** `connections` ≈ requests (slow) vs a handful (fix).
-
 ## Root cause
 A `Connection: close` header disables keep-alive: one TCP connection per request.
 

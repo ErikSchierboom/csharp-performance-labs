@@ -1,8 +1,6 @@
 # L13-02 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
 - **Timeline:** request threads blocked on the logger lock; **strace:** thousands of open/write/close.
 
 ## Root cause

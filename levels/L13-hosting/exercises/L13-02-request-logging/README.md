@@ -3,7 +3,7 @@
 *Dear Diary*
 
 ## Symptom
-The service logs four lines per request through a small custom file logger. At 32 users **p99 is dominated by logging**. The logging *volume* is modest; the way it's written is the cost. Removing the log calls makes the endpoint several times faster.
+The service logs four lines per request through a small custom file logger. Latency is not what it should be.
 
 ## Goal
 Same result (checksum), and:

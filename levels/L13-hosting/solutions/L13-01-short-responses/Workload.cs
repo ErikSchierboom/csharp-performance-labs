@@ -9,8 +9,9 @@ namespace ShortResponses;
 
 public static class Workload
 {
-    static readonly HashSet<int> Ports = new();
-    static readonly WebRig Rig = WebRig.Start(app =>
+    private static readonly HashSet<int> Ports = new();
+
+    private static readonly WebRig Rig = WebRig.Start(app =>
     {
         app.MapGet("/ping", (HttpContext ctx) => { lock (Ports) Ports.Add(ctx.Connection.RemotePort); return "pong"; });
     });
