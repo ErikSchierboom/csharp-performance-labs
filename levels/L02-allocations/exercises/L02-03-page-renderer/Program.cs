@@ -5,6 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L02-03-page-renderer",
     Workload: Workload.Run,
     ExpectedChecksum: 2024728565835087958,
-    MaxMedianMs: 20,
-    MaxAllocatedMb: 1,
-    MaxGen2Collections: 2), args);
+    MaxMetrics: new() { [Metrics.Gen2] = 2, [Metrics.Time] = 20, [Metrics.Alloc] = 1 }), args);

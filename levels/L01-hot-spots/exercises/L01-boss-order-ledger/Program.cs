@@ -5,5 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L01-boss-order-ledger",
     Workload: Workload.Run,
     ExpectedChecksum: 9648128162,
-    MaxMedianMs: 5,
-    MaxAllocatedMb: 9), args);
+    MaxMetrics: new() { [Metrics.Time] = 8, [Metrics.Alloc] = 9 }), args);

@@ -8,19 +8,8 @@ namespace PerfLab.Harness;
 /// <param name="Name">Display name for the exercise, printed as the harness banner.</param>
 /// <param name="Workload">The exercise's entry point. Runs once per warm-up/measured iteration and returns a checksum.</param>
 /// <param name="ExpectedChecksum">The checksum a correct implementation must return. A fast but wrong answer fails with exit code 2.</param>
-/// <param name="MaxMedianMs">Time budget, in reference milliseconds. Scaled to this machine by <see cref="Lab"/>'s machine-factor calibration, unless <see cref="ScaleTime"/> is <see langword="false"/>.</param>
-/// <param name="MaxAllocatedMb">Allocation budget, in MB. Never scaled: allocation budgets are absolute and deterministic.</param>
 /// <param name="WarmupRuns">Minimum number of warm-up runs before measurement starts.</param>
 /// <param name="MeasuredRuns">Number of measured runs the harness reports on (the median is used for pass/fail).</param>
-/// <param name="MaxGen2Collections">
-/// Optional ceiling on gen2 (full) collections per run. Level 2+ uses it for LOH-churn style problems where total
-/// bytes allocated alone doesn't tell the whole story. <see cref="int.MaxValue"/> means this budget isn't gated.
-/// </param>
-/// <param name="MaxRetainedMb">
-/// Optional ceiling on memory still reachable after each run, measured after a forced full collection relative to
-/// just before the run. This is the leak gate for Level 3: a healthy workload retains ~0 between runs.
-/// <see cref="double.MaxValue"/> means this budget isn't gated.
-/// </param>
 /// <param name="Reset">
 /// Optional callback invoked before every run (warm-up and measured) to clear <i>test scaffolding</i> state, so a
 /// leak from one run doesn't pile onto the next and make results depend on how many runs came before it. This is
@@ -30,34 +19,44 @@ namespace PerfLab.Harness;
 /// When <see langword="false"/>, warm-up is exactly <see cref="WarmupRuns"/> runs with no time-based extension,
 /// used by leak exercises so warm-up doesn't multiply the leak.
 /// </param>
-/// <param name="MaxP99Ms">Optional p99 latency budget (Level 4+), in reference ms, scaled like <see cref="MaxMedianMs"/>. Workloads report latencies via <see cref="Lab.RecordLatency"/>.</param>
-/// <param name="MaxCpuMs">Optional CPU-time budget (Level 4+), in reference ms, scaled like <see cref="MaxMedianMs"/>.</param>
-/// <param name="MaxMetrics">Optional named-metric budgets (e.g. <c>sqlCommands</c>, <c>connections</c>) reported via <see cref="Lab.Report"/>; the harness keeps the maximum observed per run.</param>
+/// <param name="MaxMetrics">
+/// Named-metric budgets: the median observed per run must be at or under this value, or that row fails. Every
+/// per-run budget lives in this one dictionary, including time and allocation - there's no other way to gate them.
+/// Most entries are workload-reported (e.g. <c>sqlCommands</c>, <c>connections</c>) via <see cref="Lab.Report"/>;
+/// the harness keeps the maximum <see cref="Lab.Report"/> call per run, then medians across runs. A handful of
+/// names are built into the harness itself instead, each measured automatically every run with no workload code
+/// needed: <see cref="Metrics.Time"/> (wall-clock time), <see cref="Metrics.Alloc"/> (bytes allocated, MB - never
+/// scaled: allocation budgets are absolute and deterministic), <see cref="Metrics.P99"/> (p99 latency, via
+/// <see cref="Lab.RecordLatency"/>), <see cref="Metrics.Cpu"/> (CPU time across all threads), <see cref="Metrics.Gen2"/>
+/// (full collections per run - Level 2+, LOH-churn problems where total bytes alone doesn't tell the whole story) and
+/// <see cref="Metrics.Retained"/> (memory still reachable after a forced full collection - the leak gate for Level 3;
+/// a healthy workload retains ~0 between runs). <see cref="Metrics.Time"/>, <see cref="Metrics.P99"/> and
+/// <see cref="Metrics.Cpu"/> scale with the machine factor; the rest don't. Omit a key entirely to leave that budget
+/// ungated - including <see cref="Metrics.Time"/>/<see cref="Metrics.Alloc"/>: an exercise can be pure exploration
+/// (run it, watch whatever metrics you choose to report, nothing to pass or fail) by setting none at all.
+/// </param>
 /// <param name="ScaleTime">
-/// When <see langword="false"/>, <see cref="MaxMedianMs"/>, <see cref="MaxP99Ms"/> and <see cref="MaxCpuMs"/> are
-/// compared as-is, with no machine-factor scaling. Use this when the workload's time is dominated by a fixed
-/// wall-clock wait (<c>Task.Delay</c>, <c>Thread.Sleep</c>, a real socket connect) rather than CPU work: a faster
-/// CPU doesn't make those waits shorter, so scaling the budget down for a fast machine would fail a correct fix.
+/// When <see langword="false"/>, <see cref="Metrics.Time"/>, <see cref="Metrics.P99"/> and <see cref="Metrics.Cpu"/>
+/// (see <see cref="MaxMetrics"/>) are compared as-is, with no machine-factor scaling. Use this when the workload's
+/// time is dominated by a fixed wall-clock wait (<c>Task.Delay</c>, <c>Thread.Sleep</c>, a real socket connect)
+/// rather than CPU work: a faster CPU doesn't make those waits shorter, so scaling the budget down for a fast
+/// machine would fail a correct fix.
 /// </param>
 /// <param name="MaxFirstRunMs">
 /// Optional budget for the very first run (the first warm-up run: cold JIT, cold caches, an unwarmed thread pool), in
-/// reference ms, scaled like <see cref="MaxMedianMs"/>. The first run's time is always printed; set this when the
-/// exercise is about start-up behaviour that warm-up would otherwise hide. <see cref="double.MaxValue"/> means not gated.
+/// reference ms, scaled like <see cref="Metrics.Time"/>. Unlike <see cref="MaxMetrics"/>, this is a single cold
+/// measurement, not a median across runs, so it stays its own field. The first run's time is always printed; set
+/// this when the exercise is about start-up behaviour that warm-up would otherwise hide. <see cref="double.MaxValue"/>
+/// means not gated.
 /// </param>
 public sealed record LabSpec(
     string Name,
     Func<long> Workload,
     long ExpectedChecksum,
-    double MaxMedianMs,
-    double MaxAllocatedMb,
     int WarmupRuns = 2,
     int MeasuredRuns = 5,
-    int MaxGen2Collections = int.MaxValue,
-    double MaxRetainedMb = double.MaxValue,
     Action? Reset = null,
     bool TimedWarmup = true,
-    double MaxP99Ms = double.MaxValue,
-    double MaxCpuMs = double.MaxValue,
     Dictionary<string, double>? MaxMetrics = null,
     bool ScaleTime = true,
     double MaxFirstRunMs = double.MaxValue);
@@ -72,7 +71,9 @@ public sealed record LabSpec(
 public static class Lab
 {
     private static readonly ConcurrentBag<double> Latencies = new();
-    private static readonly ConcurrentDictionary<string, double> Metrics = new();
+    // Named "ReportedMetrics" rather than "Metrics" so it doesn't collide with the PerfLab.Harness.Metrics type
+    // (the well-known metric-name constants) when this class references both in the same scope.
+    private static readonly ConcurrentDictionary<string, double> ReportedMetrics = new();
 
     /// <summary>Record one operation's latency. Thread-safe. The harness reports the p99 per run.</summary>
     /// <param name="ms">The operation's latency, in milliseconds.</param>
@@ -81,7 +82,7 @@ public static class Lab
     /// <summary>Report a named value (e.g. peak queue length). Thread-safe; the harness keeps the maximum per run.</summary>
     /// <param name="name">Metric name, matched against <see cref="LabSpec.MaxMetrics"/>.</param>
     /// <param name="value">The value observed this call; the harness retains the maximum seen per run.</param>
-    public static void Report(string name, double value) => Metrics.AddOrUpdate(name, value, (_, old) => Math.Max(old, value));
+    public static void Report(string name, double value) => ReportedMetrics.AddOrUpdate(name, value, (_, old) => Math.Max(old, value));
 
     /// <summary>Runs an exercise: dispatches to measured, <c>--profile</c>, or <c>--cold</c> mode based on <paramref name="args"/>. See <see cref="Lab"/> for what each mode does.</summary>
     /// <param name="spec">The exercise's budgets, workload and checksum.</param>
@@ -95,13 +96,13 @@ public static class Lab
         if (args.Contains("--calibrate")) return RunCalibrate();
         if (args.Contains("--cold")) return RunCold(spec, GetInt(args, "--runs", 12));
         return args.Contains("--profile")
-            ? RunProfile(spec, GetInt(args, "--seconds", 15))
-            : RunMeasure(spec);
+            ? Profile(spec, GetInt(args, "--seconds", 15))
+            : Measure(spec);
     }
 
     const int MinWarmupMs = 1000, MaxWarmupRuns = 60;
 
-    private static int RunMeasure(LabSpec spec)
+    private static int Measure(LabSpec spec)
     {
         // Warm up by *time* as well as by count. Tiered JIT promotes hot methods to fully optimised code on a
         // background thread after a ~100 ms quiet period, so two quick runs would leave a correct, fast fix still
@@ -121,24 +122,15 @@ public static class Lab
         }
 
         var factor = spec.ScaleTime ? MachineFactor() : 1.0;
-        var timeBudget = spec.MaxMedianMs * factor;
         Console.WriteLine(!spec.ScaleTime
             ? "Time budgets: unscaled (fixed-delay workload, ScaleTime: false)."
             : Math.Abs(factor - 1.0) < 1e-9
                 ? "Time budgets: unscaled (PERFLAB_NO_SCALE=1)."
-                : $"Machine factor {factor:F2}x vs. reference: time budgets scaled (median {spec.MaxMedianMs:F1} -> {timeBudget:F2} ms"
-                  + (Math.Abs(spec.MaxP99Ms - double.MaxValue) > 0 ? $", p99 {spec.MaxP99Ms:F1} -> {spec.MaxP99Ms * factor:F2} ms" : "")
-                  + ").");
+                : ScaledBudgetsBanner(spec, factor));
         if (Math.Abs(spec.MaxFirstRunMs - double.MaxValue) < 1)   // when gated, it gets its own row in the results table instead
             Console.WriteLine($"First run: {firstMs:F1} ms (cold, part of the warm-up, not in the median).");
         Console.WriteLine();
 
-        var times = new List<double>();
-        var allocs = new List<double>();
-        var gen2s = new List<double>();
-        var retained = new List<double>();
-        var p99s = new List<double>();
-        var cpus = new List<double>();
         var metricRuns = new Dictionary<string, List<double>>();
         var proc = Process.GetCurrentProcess();
         Console.WriteLine($"{"run",4} {"ms",10} {"alloc MB",10} {"gen0",5} {"gen1",5} {"gen2",5}");
@@ -150,8 +142,10 @@ public static class Lab
             GC.WaitForPendingFinalizers();
             GC.Collect();
 
+            foreach (var (k, v) in ReportedMetrics) { if (!metricRuns.TryGetValue(k, out var list)) metricRuns[k] = list = new(); list.Add(v); }
+
             var heap0 = GC.GetTotalMemory(false);
-            Latencies.Clear(); Metrics.Clear();
+            Latencies.Clear(); ReportedMetrics.Clear();
             proc.Refresh(); var cpu0 = proc.TotalProcessorTime;
             int g0 = GC.CollectionCount(0), g1 = GC.CollectionCount(1), g2 = GC.CollectionCount(2);
             var a0 = GC.GetTotalAllocatedBytes(precise: true);
@@ -163,74 +157,77 @@ public static class Lab
             proc.Refresh(); var cpuMs = (proc.TotalProcessorTime - cpu0).TotalMilliseconds;
             var mb = (GC.GetTotalAllocatedBytes(precise: true) - a0) / 1024.0 / 1024.0;
 
-            // A wrong checksum no longer stops the run: it's tracked and shown as a row alongside every other
-            // metric, so a workload whose correctness depends on live scheduling (e.g. how many requests give up
-            // under load) still gets a full report instead of an early, uninformative bailout.
             if (result != spec.ExpectedChecksum) { wrongRuns++; wrongChecksumSeen ??= result; }
 
-            times.Add(ms);
-            allocs.Add(mb);
-            cpus.Add(cpuMs);
-            if (!Latencies.IsEmpty) { var l = Latencies.OrderBy(x => x).ToArray(); p99s.Add(l[(int)Math.Min(l.Length - 1, Math.Ceiling(l.Length * 0.99) - 1)]); }
-            foreach (var (k, v) in Metrics) { if (!metricRuns.TryGetValue(k, out var list)) metricRuns[k] = list = new(); list.Add(v); }
-            gen2s.Add(GC.CollectionCount(2) - g2);
-            Console.WriteLine($"{i,4} {ms,10:F1} {mb,10:F2} {GC.CollectionCount(0) - g0,5} {GC.CollectionCount(1) - g1,5} {GC.CollectionCount(2) - g2,5}");
+            var gen2Count = GC.CollectionCount(2) - g2;
+            double? p99 = null;
+            if (!Latencies.IsEmpty) { var l = Latencies.OrderBy(x => x).ToArray(); p99 = l[(int)Math.Min(l.Length - 1, Math.Ceiling(l.Length * 0.99) - 1)]; }
+            Console.WriteLine($"{i,4} {ms,10:F1} {mb,10:F2} {GC.CollectionCount(0) - g0,5} {GC.CollectionCount(1) - g1,5} {gen2Count,5}");
 
-            // What is still reachable now? (After the row is printed so these collections don't pollute the GC columns.)
             GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect();
-            retained.Add(Math.Max(0, GC.GetTotalMemory(true) - heap0) / 1024.0 / 1024.0);
-        }
+            var retainedMb = Math.Max(0, GC.GetTotalMemory(true) - heap0) / 1024.0 / 1024.0;
 
-        double medMs = Median(times), medMb = Median(allocs);
-        var timeOk = medMs <= timeBudget;
-        var allocOk = medMb <= spec.MaxAllocatedMb;
-        var medGen2 = Median(gen2s);
-        var gen2Gated = spec.MaxGen2Collections != int.MaxValue;
-        var gen2Ok = !gen2Gated || medGen2 <= spec.MaxGen2Collections;
-        var medRet = Median(retained);
-        var retGated = Math.Abs(spec.MaxRetainedMb - double.MaxValue) > 0;
-        var retOk = !retGated || medRet <= spec.MaxRetainedMb;
+            Report(Metrics.Time, ms);
+            Report(Metrics.Alloc, mb);
+            if (p99 is { } p99Value) Report(Metrics.P99, p99Value);
+            Report(Metrics.Cpu, cpuMs);
+            Report(Metrics.Gen2, gen2Count);
+            Report(Metrics.Retained, retainedMb);
+        }
+        foreach (var (k, v) in ReportedMetrics) { if (!metricRuns.TryGetValue(k, out var list)) metricRuns[k] = list = new(); list.Add(v); }
+
         var checksumOk = wrongRuns == 0;
 
         Console.WriteLine();
         Row("metric", "value", "budget", "unit", "result");
-        Print("median time", medMs, timeBudget, "ms", timeOk);
-        Print("median alloc", medMb, spec.MaxAllocatedMb, "MB", allocOk);
-        if (gen2Gated)
-            Print("median gen2", medGen2, spec.MaxGen2Collections, "", gen2Ok, "F0");
-        if (retGated)
-            Print("median kept", medRet, spec.MaxRetainedMb, "MB", retOk, note: "still reachable after a full GC");
         var extraOk = true;
-        if (Math.Abs(spec.MaxP99Ms - double.MaxValue) > 0)
-        {
-            double p99 = p99s.Count > 0 ? Median(p99s) : double.NaN, b = spec.MaxP99Ms * factor;
-            var ok = p99 <= b; extraOk &= ok;
-            Print("median p99", p99, b, "ms", ok);
-        }
         if (Math.Abs(spec.MaxFirstRunMs - double.MaxValue) > 0)
         {
             double b = spec.MaxFirstRunMs * factor;
             var ok = firstMs <= b; extraOk &= ok;
             Print("first run", firstMs, b, "ms", ok, note: "cold: before any warm-up");
         }
-        if (Math.Abs(spec.MaxCpuMs - double.MaxValue) > 0)
-        {
-            double cpu = Median(cpus), b = spec.MaxCpuMs * factor;
-            var ok = cpu <= b; extraOk &= ok;
-            Print("median cpu", cpu, b, "ms", ok, note: "CPU time across all threads");
-        }
         if (spec.MaxMetrics != null)
             foreach (var (name, max) in spec.MaxMetrics)
             {
                 var v = metricRuns.TryGetValue(name, out var list) ? Median(list) : double.NaN;
-                var ok = v <= max; extraOk &= ok;
-                Print(name, v, max, "", ok, "F0");
+                var (label, unit, format, scale, note) = BuiltInMetricDisplay.TryGetValue(name, out var meta) ? meta : (name, "", "F0", false, null);
+                var b = scale ? max * factor : max;
+                var ok = v <= b; extraOk &= ok;
+                Print(label, v, b, unit, ok, format, note);
             }
-        var pass = checksumOk && timeOk && allocOk && gen2Ok && retOk && extraOk;
+        var pass = checksumOk && extraOk;
         Console.WriteLine(pass ? "\nRESULT: PASS"
             : !checksumOk ? "\nRESULT: wrong result - fix correctness first."
             : "\nRESULT: over budget - keep profiling.");
         return pass ? 0 : !checksumOk ? 2 : 1;
+    }
+
+    // Display metadata for the handful of metric names the harness measures itself (see LabSpec.MaxMetrics):
+    // the row label (kept as it always printed, e.g. "median kept" rather than "retained"), unit, number format,
+    // whether the budget scales with the machine factor, and an optional note. Any other MaxMetrics key is a
+    // workload-reported metric and falls back to (its own name, no unit, whole numbers, unscaled, no note).
+    private static readonly Dictionary<string, (string Label, string Unit, string Format, bool Scale, string? Note)> BuiltInMetricDisplay = new()
+    {
+        [Metrics.Time] = ("median time", "ms", "F2", true, null),
+        [Metrics.Alloc] = ("median alloc", "MB", "F2", false, null),
+        [Metrics.P99] = ("median p99", "ms", "F2", true, null),
+        [Metrics.Cpu] = ("median cpu", "ms", "F2", true, "CPU time across all threads"),
+        [Metrics.Gen2] = ("median gen2", "", "F0", false, null),
+        [Metrics.Retained] = ("median kept", "MB", "F2", false, "still reachable after a full GC"),
+    };
+
+    // The "Machine factor Nx vs. reference: time budgets scaled (...)" banner mentions whichever of the
+    // machine-scaled budgets (time/p99/cpu) this exercise actually gates - none, one or all three.
+    private static string ScaledBudgetsBanner(LabSpec spec, double factor)
+    {
+        var parts = new List<string>();
+        foreach (var (name, label) in new[] { (Metrics.Time, "median"), (Metrics.P99, "p99"), (Metrics.Cpu, "cpu") })
+            if (spec.MaxMetrics != null && spec.MaxMetrics.TryGetValue(name, out var max))
+                parts.Add($"{label} {max:F1} -> {max * factor:F2} ms");
+        return parts.Count == 0
+            ? $"Machine factor {factor:F2}x vs. reference."
+            : $"Machine factor {factor:F2}x vs. reference: time budgets scaled ({string.Join(", ", parts)}).";
     }
 
     /// <summary>Prints one result row: the median value against its budget, and PASS/FAIL.</summary>
@@ -263,7 +260,7 @@ public static class Lab
         return 0;
     }
 
-    private static int RunProfile(LabSpec spec, int seconds)
+    private static int Profile(LabSpec spec, int seconds)
     {
         Console.WriteLine($"Profile mode: looping for ~{seconds}s. Attach/start your profiler now if you haven't.");
         if (!CheckResult(spec, spec.Workload())) return 2;   // one warm-up so JIT noise is out of the way
@@ -287,7 +284,7 @@ public static class Lab
     // whose time is a fixed wall-clock wait (Task.Delay/Thread.Sleep/a real connect), not CPU work: a
     // faster CPU doesn't shrink those, so this factor would otherwise scale their budget down wrongly.
     // ReferenceSpinMs is this machine's own measured spin time (best of 4, pinned to one core), rounded
-    // to 50 ms - the machine every exercise's MaxMedianMs/MaxP99Ms/MaxCpuMs is calibrated against. It
+    // to 50 ms - the machine every exercise's time-scaled MaxMetrics entries (Metrics.Time/P99/Cpu) are calibrated against. It
     // isn't a "slow box"; it's just the fixed point everything else scales relative to.
     const double ReferenceSpinMs = 50.0;
 
@@ -334,7 +331,7 @@ public static class Lab
         Console.WriteLine($"best: {best:F2} ms");
         Console.WriteLine($"Current ReferenceSpinMs is {ReferenceSpinMs:F1} ms (this machine's factor: {best / ReferenceSpinMs:F3}x).");
         Console.WriteLine("To make THIS machine the new reference: set ReferenceSpinMs to the value above (rounded),");
-        Console.WriteLine("then rescale every exercise's MaxMedianMs/MaxP99Ms/MaxCpuMs by (new / old) to preserve");
+        Console.WriteLine("then rescale every exercise's time-scaled MaxMetrics entries (Metrics.Time/P99/Cpu) by (new / old) to preserve");
         Console.WriteLine("current pass/fail behaviour - don't just change the constant on its own.");
         return 0;
     }

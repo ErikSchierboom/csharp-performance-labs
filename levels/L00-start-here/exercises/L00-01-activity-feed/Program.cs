@@ -5,5 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L00-01-activity-feed",
     Workload: Workload.Run,
     ExpectedChecksum: 576201561659499,
-    MaxMedianMs: 29,
-    MaxAllocatedMb: 8), args);
+    MaxMetrics: new() { [Metrics.Time] = 29, [Metrics.Alloc] = 8 }), args);

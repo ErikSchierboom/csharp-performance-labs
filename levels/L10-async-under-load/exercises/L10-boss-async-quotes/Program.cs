@@ -5,12 +5,9 @@ return Lab.Run(new LabSpec(
     Name: "L10-boss-async-quotes",
     Workload: Workload.Run,
     ExpectedChecksum: 80000241892,
-    MaxMedianMs: 700,
-    MaxAllocatedMb: 5,
     ScaleTime: false,
-    MaxP99Ms: 200,
-    MaxMetrics: new() { [Metrics.PeakInFlight] = 61 },
     WarmupRuns: 1,
     MeasuredRuns: 3,
     Reset: Workload.Reset,
-    TimedWarmup: false), args);
+    TimedWarmup: false,
+    MaxMetrics: new() { [Metrics.PeakInFlight] = 61, [Metrics.P99] = 200, [Metrics.Time] = 700, [Metrics.Alloc] = 5 }), args);

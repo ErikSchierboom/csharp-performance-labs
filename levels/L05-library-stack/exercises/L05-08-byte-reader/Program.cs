@@ -5,5 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L05-08-byte-reader",
     Workload: Workload.Run,
     ExpectedChecksum: 51039148,
-    MaxMedianMs: 3,
-    MaxAllocatedMb: 1), args);
+    MaxMetrics: new() { [Metrics.Time] = 3, [Metrics.Alloc] = 1 }), args);

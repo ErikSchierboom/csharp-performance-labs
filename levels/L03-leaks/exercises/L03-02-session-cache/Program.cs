@@ -5,8 +5,6 @@ return Lab.Run(new LabSpec(
     Name: "L03-02-session-cache",
     Workload: Workload.Run,
     ExpectedChecksum: 81102788,
-    MaxMedianMs: 10,
-    MaxAllocatedMb: 202,
-    MaxRetainedMb: 3,
     Reset: Workload.Reset,
-    TimedWarmup: false), args);
+    TimedWarmup: false,
+    MaxMetrics: new() { [Metrics.Retained] = 3, [Metrics.Time] = 10, [Metrics.Alloc] = 202 }), args);

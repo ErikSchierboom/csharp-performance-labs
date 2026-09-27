@@ -5,5 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L06-boss-sensor-grid",
     Workload: Workload.Run,
     ExpectedChecksum: 7975907828,
-    MaxMedianMs: 24,
-    MaxAllocatedMb: 1), args);
+    MaxMetrics: new() { [Metrics.Time] = 24, [Metrics.Alloc] = 1 }), args);

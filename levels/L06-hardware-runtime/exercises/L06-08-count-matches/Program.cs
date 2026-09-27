@@ -5,5 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L06-08-count-matches",
     Workload: Workload.Run,
     ExpectedChecksum: 1013600,
-    MaxMedianMs: 8,
-    MaxAllocatedMb: 1), args);
+    MaxMetrics: new() { [Metrics.Time] = 8, [Metrics.Alloc] = 1 }), args);

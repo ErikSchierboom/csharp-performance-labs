@@ -8,6 +8,21 @@ namespace PerfLab.Harness;
 /// </summary>
 public static class Metrics
 {
+    // These six are measured by the harness itself every run - never call Lab.Report for them; just gate them via
+    // LabSpec.MaxMetrics like any other named metric. See LabSpec.MaxMetrics for what each one means.
+    /// <summary>Built in: wall-clock time for the run. Scales with the machine factor.</summary>
+    public const string Time = "time";
+    /// <summary>Built in: bytes allocated during the run, in MB. Never scaled - allocation budgets are absolute and deterministic.</summary>
+    public const string Alloc = "alloc";
+    /// <summary>Built in: p99 latency across every <see cref="Lab.RecordLatency"/> call. Scales with the machine factor.</summary>
+    public const string P99 = "p99";
+    /// <summary>Built in: CPU time across all threads. Scales with the machine factor.</summary>
+    public const string Cpu = "cpu";
+    /// <summary>Built in: full (gen2) collections in the run.</summary>
+    public const string Gen2 = "gen2";
+    /// <summary>Built in: memory still reachable after a forced full GC, relative to just before the run.</summary>
+    public const string Retained = "retained";
+
     /// <summary>Committed memory, MB (Level 7: <c>L07-03-works-on-my-laptop</c>).</summary>
     public const string CommittedMb = "committedMB";
 

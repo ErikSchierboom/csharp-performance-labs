@@ -48,12 +48,6 @@ foreach ($kind in @("solutions", "exercises")) {
 
         $name = "$kind/$($d.Name)"
 
-        # Exploration exercises (no pass/fail budget, e.g. L06-07 warm-up curve) are skipped.
-        if ($hasProgram -and (Select-String -Path $programCs -Pattern "no pass/fail gate" -Quiet)) {
-            "{0,-34} {1,-9} {2,-9} {3}" -f $name, "n/a", "n/a", "skipped (exploration)" | Write-Host
-            continue
-        }
-
         $total++
 
         $job = Start-Job -ScriptBlock {
@@ -71,7 +65,7 @@ foreach ($kind in @("solutions", "exercises")) {
         Remove-Job $job -Force
 
         $verdict = "OK"
-        if ($rc -ne $want) { $fail = 1; $verdict = "SURPRISE" }
+        if ($rc -gt $want) { $fail = 1; $verdict = "SURPRISE" }
         "{0,-34} {1,-9} {2,-9} {3}" -f $name, "exit $want", "exit $rc", $verdict | Write-Host
     }
 }

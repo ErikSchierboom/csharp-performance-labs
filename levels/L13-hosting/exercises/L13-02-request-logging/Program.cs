@@ -5,6 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L13-02-request-logging",
     Workload: Workload.Run,
     ExpectedChecksum: 300000905445,
-    MaxMedianMs: 15,
-    MaxAllocatedMb: 10,
-    MaxP99Ms: 1), args);
+    MaxMetrics: new() { [Metrics.P99] = 1, [Metrics.Time] = 15, [Metrics.Alloc] = 10 }), args);

@@ -5,5 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L02-08-small-sums",
     Workload: Workload.Run,
     ExpectedChecksum: 552000000,
-    MaxMedianMs: 15,
-    MaxAllocatedMb: 1), args);
+    MaxMetrics: new() { [Metrics.Time] = 15, [Metrics.Alloc] = 1 }), args);

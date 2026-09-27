@@ -5,5 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L02-02-order-lines",
     Workload: Workload.Run,
     ExpectedChecksum: 29484049425886904,
-    MaxMedianMs: 30,
-    MaxAllocatedMb: 1), args);
+    MaxMetrics: new() { [Metrics.Time] = 30, [Metrics.Alloc] = 1 }), args);

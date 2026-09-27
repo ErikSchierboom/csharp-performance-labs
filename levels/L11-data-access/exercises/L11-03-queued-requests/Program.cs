@@ -5,6 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L11-03-queued-requests",
     Workload: Workload.Run,
     ExpectedChecksum: 128000385280,
-    MaxMedianMs: 500,
-    MaxAllocatedMb: 3,
-    MaxP99Ms: 50), args);
+    MaxMetrics: new() { [Metrics.P99] = 50, [Metrics.Time] = 500, [Metrics.Alloc] = 3 }), args);

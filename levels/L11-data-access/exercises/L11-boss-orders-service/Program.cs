@@ -6,7 +6,4 @@ return Lab.Run(new LabSpec(
     Name: "L11-boss-orders-service",
     Workload: Workload.Run,
     ExpectedChecksum: 80000241823,
-    MaxMedianMs: 350,
-    MaxAllocatedMb: 35,
-    MaxP99Ms: 40,
-    MaxMetrics: new() { [DbMetrics.CommandsPerRequest] = 3 }), args);
+    MaxMetrics: new() { [DbMetrics.CommandsPerRequest] = 3, [Metrics.P99] = 40, [Metrics.Time] = 350, [Metrics.Alloc] = 35 }), args);

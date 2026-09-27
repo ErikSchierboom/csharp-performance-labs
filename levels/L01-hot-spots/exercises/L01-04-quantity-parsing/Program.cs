@@ -5,5 +5,4 @@ return Lab.Run(new LabSpec(
     Name: "L01-04-quantity-parsing",
     Workload: Workload.Run,
     ExpectedChecksum: 751376505601,
-    MaxMedianMs: 150,
-    MaxAllocatedMb: 45), args);
+    MaxMetrics: new() { [Metrics.Time] = 150, [Metrics.Alloc] = 45 }), args);
