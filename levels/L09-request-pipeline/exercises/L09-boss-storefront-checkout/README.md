@@ -10,10 +10,10 @@ Same result (checksum), and:
 
 | Budget | Value |
 |---|---|
-| Median time | 934 ref-ms |
-| Median allocated | 752 MB |
-| Median gen2 collections | ≤ 2 |
-| Median p99 latency | 44 ref-ms |
+| Median time | 300 ref-ms |
+| Median allocated | 320 MB |
+| Median gen2 collections | 0 |
+| Median p99 latency | 15 ref-ms |
 
 > This exercise starts an ASP.NET Core server on loopback **inside the harness process** and drives it with virtual users (`PerfLab.Harness.Web.WebRig`). Latency (p50/p99) comes from the client's view of each request.
 **Allocation and CPU include the small, constant cost of the load-generating client**, so treat allocation budgets as "server + client". Because both share the machine, results are less exact than the console exercises. `taskset -c 0-7 dotnet run ...` reduces noise.

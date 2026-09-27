@@ -25,11 +25,11 @@ static partial class Log
 
 public static class Workload
 {
-    static readonly Regex AreaRegex = new(@"^/(?<area>\w+)$", RegexOptions.Compiled);
-    static readonly byte[] Body = System.Text.Encoding.UTF8.GetBytes(JsonSerializer.Serialize(
+    private static readonly Regex AreaRegex = new(@"^/(?<area>\w+)$", RegexOptions.Compiled);
+    private static readonly byte[] Body = System.Text.Encoding.UTF8.GetBytes(JsonSerializer.Serialize(
         new Basket(Enumerable.Range(0, 1_600).Select(i => new Line(i, "item-" + i, i % 9 + 1)).ToList())));      // ~60 KB
 
-    static HttpContent MakeContent(int i)
+    private static HttpContent MakeContent(int i)
     {
         var c = new ByteArrayContent(Body);
         c.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
@@ -47,18 +47,16 @@ public static class Workload
         });
         app.MapPost("/checkout", async (HttpContext ctx) =>
         {
-            var tax = ctx.RequestServices.GetRequiredService<TaxTable>();                                      // singleton
-            var basket = (await JsonSerializer.DeserializeAsync<Basket>(ctx.Request.Body))!;                  // stream, no string
-            long total = basket.Lines.Sum(l => (long)l.Qty * (100 + tax.Rate(l.Id)));
+            var tax = ctx.RequestServices.GetRequiredService<TaxTable>();
+            var basket = (await JsonSerializer.DeserializeAsync<Basket>(ctx.Request.Body))!; // stream, no string
+            var total = basket.Lines.Sum(l => (long)l.Qty * (100 + tax.Rate(l.Id)));
             ctx.Response.ContentType = "text/plain";
             var sb = new System.Text.StringBuilder(2_000);
             for (int i = 0; i < 60; i++) sb.Append("line ").Append(i).Append(": ").Append(total + i).Append('\n');
-            await ctx.Response.WriteAsync(sb.ToString());                                                      // one write
+            await ctx.Response.WriteAsync(sb.ToString()); // one write
         });
     },
-    b => b.Services.AddSingleton<TaxTable>());
-
-    public static void Reset() { }
+    b => b.Services.AddSingleton<TaxTable>()); // singleton
 
     public static long Run() => Rig.Drive(users: 24, total: 1000, i => "/checkout", HttpMethod.Post, MakeContent);
 }

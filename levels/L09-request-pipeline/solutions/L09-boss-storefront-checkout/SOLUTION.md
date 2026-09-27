@@ -1,8 +1,6 @@
 # L09-boss - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
 - Four independent L9 defects on one request path.
 
 ## Root cause
@@ -12,7 +10,7 @@ One defect from four Level 9 exercises.
 Static `Regex` and `[LoggerMessage]` in the middleware; the tax table as a real singleton; deserialise straight from the body stream; build the receipt once and write it once.
 
 ## Take-aways
-1. **Defect → source:** per-request `Regex` and interpolated log = **L09-02**; `BuildServiceProvider` per request = **L09-04**; body → string = **L09-05**; flush per line = **L09-03**.
+1. **Defect -> source:** per-request `Regex` and interpolated log = **L09-02**; `Transient` per request = **L09-04**; body -> string = **L09-05**; flush per line = **L09-03**.
 2. Each layer of the pipeline had its own signature in the allocation view: which types pointed at which?
 3. Measure bytes per request before and after each fix: which gave the largest drop?
 

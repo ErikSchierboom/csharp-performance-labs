@@ -5,8 +5,7 @@ return Lab.Run(new LabSpec(
     Name: "L09-boss-storefront-checkout",
     Workload: Workload.Run,
     ExpectedChecksum: 200001550000,
-    MaxMedianMs: 934,
-    MaxAllocatedMb: 752,
-    ScaleTime: false,
-    MaxGen2Collections: 2,
-    MaxP99Ms: 44), args);
+    MaxMedianMs: 300,
+    MaxAllocatedMb: 320,
+    MaxGen2Collections: 0,
+    MaxP99Ms: 15), args);
