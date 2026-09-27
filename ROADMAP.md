@@ -33,9 +33,18 @@ Books, articles and docs for every level: [docs/READING-LIST.md](docs/READING-LI
 | 12    | ASP.NET: caching & outbound calls                | counters                                      | 5         | `L12-boss-catalog-service`    | 🛠️     |
 | 13    | ASP.NET: hosting, runtime config, deployment     | keep-alive, logging, GC settings              | 2         | n/a                           | 🛠️     |
 | 14    | ASP.NET: production capstones                    | everything                                    | 2         | (the whole level)             | 🛠️     |
-| 15    | Workers & data pipelines (proposed)              | ?                                             | 0         | n/a                           | 💡     |
-| 16    | Remote telemetry                                 | ?                                             | 0         | n/a                           | 💡     |
 
 *"Profiling skill" names the capability you need, not a specific product; see [docs/PROFILING-GUIDE.md](docs/PROFILING-GUIDE.md) for which tools (Rider, Visual Studio, the free CLI tools, `perf`) give you each one.*
+## Specializations
+
+Optional side tracks that branch off the core levels, so the core stays at fifteen levels. Each track has its own numbering, prerequisite and boss fight, and none is needed to finish Levels 0–14. Planned layout: `specializations/<track>/{exercises,solutions}`.
+
+| Track                          | Prerequisite | Topics                                                            | Status |
+|--------------------------------|--------------|-------------------------------------------------------------------|--------|
+| Databases: RavenDB             | L4, L11      | sessions, N+1, indexes, projections, bulk insert                  | 💡     |
+| Serialization & wire formats   | L2, L5       | source generators, streaming readers, Protobuf/MessagePack        | 💡     |
+| Observability                  | L9, L13      | OpenTelemetry overhead, log volume, metric cardinality, sampling  | 💡     |
+| Messaging & background work    | L4, L10      | `Channel<T>`, backpressure, batching, consumer lag, poison messages | 💡     |
+| Startup, AOT & trimming        | L6, L13      | cold start, tiered JIT, ReadyToRun, NativeAOT                     | 💡     |
 
 **How to work through it:** in order, 0 to 14. Each level ends with a **final boss fight**: a disguised combination of that level's defects with no per-defect hints (Levels 7 and 14 *are* boss levels). Levels 9–14 assume Levels 1–4; if you want ASP.NET sooner you can take Levels 9–10 right after Level 4 and Levels 11–12 after Level 5. Level 6 is independent of Levels 3–5. Each level has a **mastery checkpoint**: something to do *without notes* before moving on.
