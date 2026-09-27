@@ -8,9 +8,9 @@ namespace AsyncHandler;
 
 public static class Workload
 {
-    static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/lookup/{id:int}", async (int id) =>
+    private static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/lookup/{id:int}", async (int id) =>
     {
-        Thread.Sleep(15);                      // a synchronous driver / file call
+        Thread.Sleep(15); // a synchronous driver / file call
         await Task.Yield();
         return (id * 2).ToString();
     }));

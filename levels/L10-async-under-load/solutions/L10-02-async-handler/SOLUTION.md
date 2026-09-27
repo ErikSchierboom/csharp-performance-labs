@@ -1,9 +1,8 @@
 # L10-02 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
-- **Timeline:** pool threads in `Thread.Sleep` (or the sync API's wait). **Counters:** queue length rising with idle CPU.
+- **Timeline:** pool threads in `Thread.Sleep` (or the sync API's wait).
+- **Counters:** queue length rising with idle CPU.
 
 ## Root cause
 A synchronous blocking call inside an `async` method. The method is async in name only; the thread is held for the whole 15 ms.

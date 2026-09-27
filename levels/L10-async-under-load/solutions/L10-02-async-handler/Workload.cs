@@ -8,9 +8,9 @@ namespace AsyncHandler;
 
 public static class Workload
 {
-    static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/lookup/{id:int}", async (int id) =>
+    private static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/lookup/{id:int}", async (int id) =>
     {
-        await Task.Delay(15);                  // the asynchronous equivalent: the thread is released while waiting
+        await Task.Delay(15); // the asynchronous equivalent: the thread is released while waiting
         return (id * 2).ToString();
     }));
 

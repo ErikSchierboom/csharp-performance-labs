@@ -23,10 +23,10 @@ public sealed class Downstream
 
 public static class Workload
 {
-    static readonly Downstream Down = new();
-    static readonly SemaphoreSlim Gate = new(40);          // what the downstream can comfortably serve at once
+    private static readonly Downstream Down = new();
+    private static readonly SemaphoreSlim Gate = new(40); // what the downstream can comfortably serve at once
 
-    static readonly WebRig Rig = WebRig.Start(app =>
+    private static readonly WebRig Rig = WebRig.Start(app =>
     {
         app.MapGet("/aggregate/{id:int}", async (int id) =>
         {

@@ -6,7 +6,7 @@ using PerfLab.Harness.Web;
 
 namespace CurrencyConversion;
 
-public sealed class RateService
+public class RateService
 {
     // Stand-in for a remote exchange-rate API: 10 ms per call.
     public async Task<decimal> FetchAsync(string currency) { await Task.Delay(10); return currency.Length * 1.25m; }
@@ -14,17 +14,16 @@ public sealed class RateService
 
 public static class Workload
 {
-    static readonly WebRig Rig = WebRig.Start(app =>
+    private static readonly WebRig Rig = WebRig.Start(app =>
     {
-        var svc = new RateService();
         var cache = new System.Collections.Concurrent.ConcurrentDictionary<string, Lazy<Task<decimal>>>();
-        app.MapGet("/convert/{cur}", async (string cur) =>
+        app.MapGet("/convert/{cur}", async (RateService svc, string cur) =>
         {
             // One fetch per currency, shared by every request; no global lock.
             var rate = await cache.GetOrAdd(cur, c => new Lazy<Task<decimal>>(() => svc.FetchAsync(c))).Value;
             return (100 * rate).ToString("F2");
         });
-    });
+    }, b => b.Services.AddSingleton<RateService>());
 
     public static void Reset() { ThreadPool.SetMinThreads(4, 4); }   // scaffolding
 

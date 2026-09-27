@@ -1,8 +1,6 @@
 # L10-01 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
 - **Counters:** thread-pool queue length > 0 and thread count growing, CPU near idle. **Timeline:** threads in `Task.Wait`/`GetResult`.
 
 ## Root cause

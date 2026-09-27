@@ -1,7 +1,6 @@
 # L10-04 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
 
 - **Counters:** healthy pool, low CPU. **Outbound calls:** ≈ one per request; **queue:** requests waiting on `SemaphoreSlim`.
 

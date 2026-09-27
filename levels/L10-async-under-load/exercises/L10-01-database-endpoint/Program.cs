@@ -6,7 +6,7 @@ return Lab.Run(new LabSpec(
     Workload: Workload.Run,
     ExpectedChecksum: 160000482831,
     MaxMedianMs: 405,
-    MaxAllocatedMb: 7,
+    MaxAllocatedMb: 3,
     ScaleTime: false,
     MaxP99Ms: 107,
     WarmupRuns: 1,

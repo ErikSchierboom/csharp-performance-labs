@@ -9,12 +9,12 @@ namespace AggregationEndpoint;
 /// <summary>A shared downstream service that gets much slower when too many calls are in flight (as most do).</summary>
 public sealed class Downstream
 {
-    int _inflight, _peak;
+    private int _inflight, _peak;
     public int Peak => _peak;
     public void ResetPeak() => _peak = 0;
     public async Task<int> CallAsync(int x)
     {
-        int n = Interlocked.Increment(ref _inflight);
+        var n = Interlocked.Increment(ref _inflight);
         int peak; while (n > (peak = _peak)) Interlocked.CompareExchange(ref _peak, n, peak);
         try { await Task.Delay(5 + n * n / 2_000); return x + 1; }
         finally { Interlocked.Decrement(ref _inflight); }
@@ -23,13 +23,13 @@ public sealed class Downstream
 
 public static class Workload
 {
-    static readonly Downstream Down = new();
+    private static readonly Downstream Down = new();
 
-    static readonly WebRig Rig = WebRig.Start(app =>
+    private static readonly WebRig Rig = WebRig.Start(app =>
     {
         app.MapGet("/aggregate/{id:int}", async (int id) =>
         {
-            var calls = Enumerable.Range(0, 30).Select(i => Down.CallAsync(id * 100 + i));      // 30 calls per request, all at once
+            var calls = Enumerable.Range(0, 30).Select(i => Down.CallAsync(id * 100 + i));
             var results = await Task.WhenAll(calls);
             return results.Sum().ToString();
         });

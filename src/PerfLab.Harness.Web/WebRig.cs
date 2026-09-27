@@ -85,7 +85,7 @@ public sealed class WebRig : IDisposable
     }
 
     /// <summary>
-    /// Like <see cref="Drive"/>, but each request is <b>abandoned</b> by the client after <paramref name="abandonAfterMs"/> ms
+    /// Like <see cref="Drive"/>, but every request is <b>abandoned</b> by the client after <paramref name="abandonAfterMs"/> ms
     /// (as a browser tab closing or a client timeout would). Abandoned requests are not errors; the checksum counts them.
     /// </summary>
     /// <param name="users">Number of concurrent virtual users.</param>
@@ -94,6 +94,20 @@ public sealed class WebRig : IDisposable
     /// <param name="abandonAfterMs">How long to wait before abandoning (cancelling) each request, in milliseconds.</param>
     /// <returns>A checksum over every request's outcome (status code, or a sentinel for a cancelled/failed request).</returns>
     public long DriveAbandon(int users, int total, Func<int, string> path, int abandonAfterMs)
+        => DriveAbandon(users, total, path, _ => abandonAfterMs);
+
+    /// <summary>
+    /// A mix of impatient and patient clients. Request <c>i</c> is abandoned after <c>abandonAfterMs(i)</c> ms, or waits
+    /// for the response when that is 0 or less. The latency of every request that <i>completes</i> is fed to
+    /// <see cref="Lab.RecordLatency"/>, so a p99 budget measures what the patient clients experienced; abandoned
+    /// requests are not recorded, since the client stopped waiting.
+    /// </summary>
+    /// <param name="users">Number of concurrent virtual users.</param>
+    /// <param name="total">Total number of requests to send across all users.</param>
+    /// <param name="path">Builds the request path from the request index.</param>
+    /// <param name="abandonAfterMs">Builds each request's patience in milliseconds from its index; 0 or less means wait for the response.</param>
+    /// <returns>A checksum over every request's outcome (status code, or a sentinel for a cancelled/failed request).</returns>
+    public long DriveAbandon(int users, int total, Func<int, string> path, Func<int, int> abandonAfterMs)
     {
         long checksum = 0; int next = 0;
         var tasks = Enumerable.Range(0, users).Select(_ => Task.Run(async () =>
@@ -101,9 +115,17 @@ public sealed class WebRig : IDisposable
             int i;
             while ((i = Interlocked.Increment(ref next) - 1) < total)
             {
-                using var cts = new CancellationTokenSource(abandonAfterMs);
+                int patience = abandonAfterMs(i);
+                using var cts = patience > 0 ? new CancellationTokenSource(patience) : new CancellationTokenSource();
+                long t0 = Stopwatch.GetTimestamp();
                 long code;
-                try { using var res = await Client.GetAsync(path(i), cts.Token); await res.Content.ReadAsStringAsync(cts.Token); code = (int)res.StatusCode; }
+                try
+                {
+                    using var res = await Client.GetAsync(path(i), cts.Token);
+                    await res.Content.ReadAsStringAsync(cts.Token);
+                    Lab.RecordLatency(Stopwatch.GetElapsedTime(t0).TotalMilliseconds);
+                    code = (int)res.StatusCode;
+                }
                 catch (OperationCanceledException) { code = -1; }
                 catch { code = -2; }
                 Interlocked.Add(ref checksum, code * 1_000_003L + 7);

@@ -1,9 +1,7 @@
 # L10-06 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
-- **Metric:** `peakConcurrentJobs` in the hundreds (slow) vs 4 (fix). **Counters:** thread count and queue length spike during the burst; HTTP p99 rises.
+- **Counters:** thread count and queue length spike during the burst; HTTP p99 rises.
 
 ## Root cause
 Unbounded fire-and-forget (`Task.Run` per request) removes all back-pressure: background concurrency equals request concurrency, and blocking jobs compete with request handling for the thread pool.

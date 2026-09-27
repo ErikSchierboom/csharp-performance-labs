@@ -14,7 +14,7 @@ public sealed class Repository
     {
         foreach (var (due, tcs, value) in Queue.GetConsumingEnumerable())
         {
-            long wait = due - Environment.TickCount64;
+            var wait = due - Environment.TickCount64;
             if (wait > 0) Thread.Sleep((int)wait);
             tcs.TrySetResult(value);
         }
@@ -29,11 +29,11 @@ public sealed class Repository
 }
 public sealed class Downstream
 {
-    int _inflight, _peak;
+    private int _inflight, _peak;
     public int Peak => _peak;
     public async Task<int> CallAsync(int x)
     {
-        int n = Interlocked.Increment(ref _inflight);
+        var n = Interlocked.Increment(ref _inflight);
         int peak; while (n > (peak = _peak)) Interlocked.CompareExchange(ref _peak, n, peak);
         try { await Task.Delay(5 + n * n / 4_000); return x + 1; }
         finally { Interlocked.Decrement(ref _inflight); }
@@ -42,16 +42,17 @@ public sealed class Downstream
 
 public static class Workload
 {
-    static readonly Downstream Down = new();
-    static readonly WebRig Rig = WebRig.Start(app =>
+    private static readonly Downstream Down = new();
+
+    private static readonly WebRig Rig = WebRig.Start(app =>
     {
         var repo = new Repository();
         app.MapGet("/quote/{id:int}", async (int id) =>
         {
-            Thread.Sleep(3);                                                   // a synchronous lookup inside an async handler
-            int score = repo.GetScoreAsync(id).Result;                         // blocks a pool thread on the driver
+            Thread.Sleep(3);
+            var score = repo.GetScoreAsync(id).Result;
             var calls = Enumerable.Range(0, 10).Select(i => Down.CallAsync(id * 10 + i));
-            var results = await Task.WhenAll(calls);                           // ten calls per request, all at once, across every request
+            var results = await Task.WhenAll(calls);
             return (score + results.Sum()).ToString();
         });
     });
