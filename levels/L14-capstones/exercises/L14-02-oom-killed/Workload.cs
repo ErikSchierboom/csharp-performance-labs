@@ -10,16 +10,17 @@ namespace OomKilled;
 
 public static class Workload
 {
-    static MemoryCache _cache = new(new MemoryCacheOptions());
-    static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/doc/{id:int}", (int id) =>
+    private static readonly MemoryCache Cache = new(new MemoryCacheOptions());
+
+    private static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/doc/{id:int}", (int id) =>
     {
-        var rendered = new byte[100_000];                                           // a rendered document: 100 KB
+        var rendered = new byte[100_000]; // a rendered document: 100 KB
         rendered[id % rendered.Length] = (byte)id;
-        _cache.Set(id, rendered);                                                   // "cache the expensive result", forever
+        Cache.Set(id, rendered);
         return rendered.Length.ToString();
     }));
 
-    public static void Reset() { _cache = new(new MemoryCacheOptions()); }   // scaffolding
+    public static void Reset() { Cache.Clear(); } // scaffolding
 
     public static long Run() { return Rig.Drive(users: 16, total: 1200, i => "/doc/" + i); }
 }

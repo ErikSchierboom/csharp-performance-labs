@@ -108,13 +108,15 @@ public static class Lab
         // running its slow tier-0 code in the measured runs. (That is itself a Level 6 topic.)
         var warmStart = Stopwatch.GetTimestamp();
         var firstMs = 0.0;
+        var wrongRuns = 0;
+        var wrongChecksumSeen = (long?)null;
         for (var i = 0; i < MaxWarmupRuns; i++)
         {
             spec.Reset?.Invoke();
             var runStart = Stopwatch.GetTimestamp();
             var warmResult = spec.Workload();
             if (i == 0) firstMs = Stopwatch.GetElapsedTime(runStart).TotalMilliseconds;
-            if (!CheckResult(spec, warmResult)) return 2;
+            if (warmResult != spec.ExpectedChecksum) { wrongRuns++; wrongChecksumSeen ??= warmResult; }
             if (i + 1 >= spec.WarmupRuns && (!spec.TimedWarmup || Stopwatch.GetElapsedTime(warmStart).TotalMilliseconds >= MinWarmupMs)) break;
         }
 
@@ -161,7 +163,10 @@ public static class Lab
             proc.Refresh(); var cpuMs = (proc.TotalProcessorTime - cpu0).TotalMilliseconds;
             var mb = (GC.GetTotalAllocatedBytes(precise: true) - a0) / 1024.0 / 1024.0;
 
-            if (!CheckResult(spec, result)) return 2;
+            // A wrong checksum no longer stops the run: it's tracked and shown as a row alongside every other
+            // metric, so a workload whose correctness depends on live scheduling (e.g. how many requests give up
+            // under load) still gets a full report instead of an early, uninformative bailout.
+            if (result != spec.ExpectedChecksum) { wrongRuns++; wrongChecksumSeen ??= result; }
 
             times.Add(ms);
             allocs.Add(mb);
@@ -185,6 +190,7 @@ public static class Lab
         var medRet = Median(retained);
         var retGated = Math.Abs(spec.MaxRetainedMb - double.MaxValue) > 0;
         var retOk = !retGated || medRet <= spec.MaxRetainedMb;
+        var checksumOk = wrongRuns == 0;
 
         Console.WriteLine();
         Row("metric", "value", "budget", "unit", "result");
@@ -220,9 +226,11 @@ public static class Lab
                 var ok = v <= max; extraOk &= ok;
                 Print(name, v, max, "", ok, "F0");
             }
-        var pass = timeOk && allocOk && gen2Ok && retOk && extraOk;
-        Console.WriteLine(pass ? "\nRESULT: PASS" : "\nRESULT: over budget - keep profiling.");
-        return pass ? 0 : 1;
+        var pass = checksumOk && timeOk && allocOk && gen2Ok && retOk && extraOk;
+        Console.WriteLine(pass ? "\nRESULT: PASS"
+            : !checksumOk ? "\nRESULT: wrong result - fix correctness first."
+            : "\nRESULT: over budget - keep profiling.");
+        return pass ? 0 : !checksumOk ? 2 : 1;
     }
 
     /// <summary>Prints one result row: the median value against its budget, and PASS/FAIL.</summary>
