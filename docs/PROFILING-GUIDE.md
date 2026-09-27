@@ -152,3 +152,34 @@ Run it: `dotnet run -c Release -- --filter '*'`. **Always Release, never under a
 - Numbers from one machine don't transfer: rerun on the target hardware.
 
 Further reading: Akinshin, *Pro .NET Benchmarking* [[4]](./READING-LIST.md#ref4); the BenchmarkDotNet diagnosers docs [[54]](./READING-LIST.md#ref54); Bakhvalov, *Performance Analysis and Tuning on Modern CPUs* [[53]](./READING-LIST.md#ref53).
+
+## Load, capacity and measurement rigor
+
+The ASP.NET levels (9-14) measure a service under concurrent load, and a few ideas from queueing theory explain most of what you'll see there. They also explain why a load test can mislead you.
+
+### Little's law and utilisation
+- **Little's law:** `in-flight requests = throughput x average latency`. A service handling 200 req/s at 50 ms average latency has about 10 requests in flight. If latency doubles at the same throughput, twice as many are in flight, and that is where the thread-pool queue, the connection pool and memory grow.
+- **Utilisation** is the fraction of a resource's capacity that is busy. Queueing delay grows slowly at first, then sharply: on a simple single-server queue the wait scales roughly with `u / (1 - u)`, so going from 50% to 90% busy multiplies the wait by about 9, and 95% by about 19. That is why latency looks fine until the service is *nearly* full, then collapses. Don't plan to run a shared resource (CPU, DB pool, thread pool) near 100%.
+- **Saturation** is the point where a resource has no spare capacity: work arrives at least as fast as it can be served, so a queue forms and keeps growing. A resource can be saturated well below 100% CPU. A pool of 10 DB connections is saturated when all 10 are checked out and callers are waiting, and a thread pool is when its work queue is non-empty and not draining, even if the cores are idle. What it looks like from outside:
+  - Throughput stops rising as you add load, and goes flat (or falls) while latency keeps climbing.
+  - A queue grows: pool wait time, `threadpool-queue-length`, pending requests, a rising in-flight count (Little's law again).
+  - Utilisation of one resource sits near its limit while the others are comfortable.
+
+  Utilisation tells you how busy a resource is, and saturation tells you whether work is already waiting for it. Check both for each resource (CPU, memory, thread pool, connection pool, disk/network, downstream service), and look for *queues* rather than just busy percentages. Saturation is also what separates the two ways to be slow: an unsaturated service is slow because each request does too much work (profile the code), a saturated one is slow because requests are waiting (find the queue and the resource it's waiting for).
+- **The bottleneck sets the ceiling.** Throughput is capped by the most saturated resource. Adding capacity anywhere else changes nothing, so find the saturated one first (CPU, pool size, a downstream dependency, a lock).
+- **Once arrivals exceed capacity the queue grows without bound**, and latency rises for as long as the overload lasts. Retries and timeouts make it worse by adding load exactly when there is none to spare (the L12 retry storm).
+
+### What the load driver can lie about
+- **Closed loop vs open loop.** A closed-loop driver (N users, each sends the next request when the last one returns; `WebRig.Drive`) slows down when the service slows down, so it never overloads it and hides queueing. An open-loop driver (requests arrive at a fixed rate whatever the service does; `WebRig.DriveOpen`) is what real traffic looks like, and it is the one that exposes saturation. Use closed loop to find best-case latency, open loop to find where it breaks.
+- **Coordinated omission.** If a stall makes the driver skip the requests it should have sent, those missing slow requests never enter the statistics and the tail looks better than it was. Measure latency from when the request was *due*, not when it was actually sent. `DriveOpen` does this.
+- **Averages hide the tail.** Report p50, p99 and max, and the number of requests behind each. A p99 from 100 samples is one request. Percentiles can't be averaged across runs or instances; merge the raw samples or histograms instead.
+- **Warm up, then measure.** Discard the start (JIT, caches, pool growth) and say how long the run was. Short runs under-sample rare events such as gen2 GCs.
+
+### Measurement checklist
+1. State the question and the number that answers it (p99 at 500 req/s, not "faster").
+2. Repeat the run, and compare the spread to the difference you are trying to detect. If the noise is bigger than the effect, you have no result.
+3. Change one thing, keep the workload identical, and record the machine state (load, power mode, Release vs Debug).
+4. Check that the result is *correct* as well as fast (the harness checksum), and that errors and timeouts are counted rather than dropped.
+5. Confirm the finding with a second method before you act on it (see [Traps](#traps)).
+
+Further reading: Gil Tene's talk "How NOT to Measure Latency" (coordinated omission); Google, *Site Reliability Engineering*, the chapter on monitoring distributed systems (latency and the four golden signals).
