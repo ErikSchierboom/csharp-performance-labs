@@ -8,18 +8,16 @@ namespace ReportService;
 
 public static class Workload
 {
-    static readonly WebRig Rig = WebRig.Start(app =>
+    private static readonly WebRig Rig = WebRig.Start(app =>
     {
         app.UseOutputCache();
         app.MapGet("/report/{n:int}", async (int n) =>
         {
-            await Task.Delay(8);                                    // an expensive report: 8 ms
+            await Task.Delay(10); // an expensive report
             return "report-" + n;
         }).CacheOutput();
     },
     b => b.Services.AddOutputCache());
-
-    public static void Reset() {  }   // scaffolding
 
     public static long Run() { return Rig.Drive(users: 32, total: 1200, i => "/report/" + i % 20); }
 }

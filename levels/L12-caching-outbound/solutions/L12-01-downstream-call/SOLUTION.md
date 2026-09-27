@@ -1,10 +1,5 @@
 # L12-01 - Solution
 
-## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
-- **Metric:** `connections` ≈ one per request (slow) vs a handful (fix).
-
 ## Root cause
 A new `HttpClient`/handler (and connection pool) per request defeats connection reuse.
 

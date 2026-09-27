@@ -2,7 +2,7 @@
 
 <details><summary>Hint 1: which tool?</summary>
 
-Downstream calls per incoming request (`downstreamCalls` ÷ 400) and the number of requests that give up (`giveUps`).
+Downstream calls per incoming request (`downstreamCalls` ÷ 400), the number of requests that give up (`giveUps`), and overall latency: a retry storm competing for the downstream's limited workers is slower end to end, not just noisier.
 </details>
 
 <details><summary>Hint 2: where?</summary>

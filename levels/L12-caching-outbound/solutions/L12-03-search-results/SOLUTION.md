@@ -1,8 +1,6 @@
 # L12-03 - Solution
 
 ## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
 - **Retained:** thousands of strings rooted from the cache's entry table.
 
 ## Root cause

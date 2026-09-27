@@ -5,10 +5,8 @@ return Lab.Run(new LabSpec(
     Name: "L12-01-downstream-call",
     Workload: Workload.Run,
     ExpectedChecksum: 80000241600,
-    MaxMedianMs: 24,
-    MaxAllocatedMb: 6,
-    ScaleTime: false,
-    MaxP99Ms: 6,
-    MaxMetrics: new() { [Metrics.Connections] = 25 },
-    Reset: Workload.Reset,
-    TimedWarmup: false), args);
+    MaxMedianMs: 8,
+    MaxAllocatedMb: 3,
+    MaxP99Ms: 1,
+    MaxMetrics: new() { [Metrics.Connections] = 16 },
+    Reset: Workload.Reset), args);

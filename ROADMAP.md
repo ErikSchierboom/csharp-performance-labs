@@ -46,5 +46,7 @@ Optional side tracks that branch off the core levels, so the core stays at fifte
 | Observability                  | L9, L13      | OpenTelemetry overhead, log volume, metric cardinality, sampling  | 💡     |
 | Messaging & background work    | L4, L10      | `Channel<T>`, backpressure, batching, consumer lag, poison messages | 💡     |
 | Startup, AOT & trimming        | L6, L13      | cold start, tiered JIT, ReadyToRun, NativeAOT                     | 💡     |
+| Systems design patterns        | L4, L12      | rate limiting, circuit breaker, bulkhead, idempotency, distributed locks, consistent hashing, replication/quorum | 💡     |
+| gRPC & HTTP/2-3                | L9           | streaming, multiplexing, header compression, connection/stream limits | 💡     |
 
 **How to work through it:** in order, 0 to 14. Each level ends with a **final boss fight**: a disguised combination of that level's defects with no per-defect hints (Levels 7 and 14 *are* boss levels). Levels 9–14 assume Levels 1–4; if you want ASP.NET sooner you can take Levels 9–10 right after Level 4 and Levels 11–12 after Level 5. Level 6 is independent of Levels 3–5. Each level has a **mastery checkpoint**: something to do *without notes* before moving on.

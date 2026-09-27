@@ -9,17 +9,23 @@ namespace PopularItems;
 
 public static class Workload
 {
-    static int _loads;
-    static Microsoft.Extensions.Caching.Memory.MemoryCache _cache = new(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions());
-    static readonly System.Collections.Concurrent.ConcurrentDictionary<int, Lazy<Task<string>>> _map = new();
-    static async Task<string> LoadAsync(int id) { Interlocked.Increment(ref _loads); await Task.Delay(50); return "item-" + id; }        // an expensive load
-    static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/item/{id:int}", async (int id) =>
+    private static int _loads;
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, Lazy<Task<string>>> _map = new();
+    private static readonly SemaphoreSlim Backend = new(8);   // the real backend can only serve 8 calls at once
+    private static async Task<string> LoadAsync(int id)
+    {
+        await Backend.WaitAsync();
+        try { Interlocked.Increment(ref _loads); await Task.Delay(50); return "item-" + id; }   // an expensive load
+        finally { Backend.Release(); }
+    }
+
+    private static readonly WebRig Rig = WebRig.Start(app => app.MapGet("/item/{id:int}", async (int id) =>
     {
         // One load per key, shared by every request that arrives while it is in flight.
         return await _map.GetOrAdd(id, k => new Lazy<Task<string>>(() => LoadAsync(k))).Value;
     }));
 
-    public static void Reset() { _cache = new Microsoft.Extensions.Caching.Memory.MemoryCache(new Microsoft.Extensions.Caching.Memory.MemoryCacheOptions()); _map.Clear(); }   // scaffolding
+    public static void Reset() { _map.Clear(); }   // scaffolding
 
     public static long Run() { Interlocked.Exchange(ref _loads, 0); var r = Rig.Drive(users: 40, total: 200, i => "/item/" + i % 5); Lab.Report(Metrics.Loads, Volatile.Read(ref _loads)); return r; }
 }

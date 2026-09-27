@@ -1,12 +1,7 @@
 # L12-05 - Solution
 
-## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
-- **Metrics:** `downstreamCalls` ≈ 2–3× requests, `giveUps` > 0 (slow); ≈ 1× and 0 (fix).
-
 ## Root cause
-Immediate, unbounded-rate retries against an overloaded dependency amplify the load that caused the failures (positive feedback).
+Immediate, unbounded-rate retries against an overloaded dependency amplify the load that caused the failures (positive feedback). The extra calls aren't free: a "fails fast" rejection still occupies one of the downstream's limited workers for its full duration, so a flood of retries competes with genuine requests for the same capacity. More load in means everyone - not just the retried requests - waits longer.
 
 ## Fix
 Bound concurrency toward the dependency (`SemaphoreSlim(15)`, below the downstream's capacity of 20), so it never overloads; then retries are rarely needed. In production add timeouts, capped retries with jittered exponential backoff, and a circuit breaker (`Microsoft.Extensions.Http.Resilience`).

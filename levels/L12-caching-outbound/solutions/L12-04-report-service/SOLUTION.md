@@ -1,10 +1,5 @@
 # L12-04 - Solution
 
-## What the profile shows
-> Illustrative: profiler views are what the code implies (no profiler capture).
-
-- **Handler invocations:** 1,200 (slow) vs ~20 (fix).
-
 ## Root cause
 Identical, cacheable responses recomputed on every request.
 

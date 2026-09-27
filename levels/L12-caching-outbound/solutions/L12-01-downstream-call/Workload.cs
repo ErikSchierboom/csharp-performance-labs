@@ -9,15 +9,17 @@ namespace DownstreamCall;
 public static class Workload
 {
     static readonly HashSet<int> Ports = new();
+
+    // The downstream service: a separate server, not the one under test.
+    internal static readonly WebRig Downstream = WebRig.Start(app =>
+        app.MapGet("/downstream", (HttpContext ctx) => { lock (Ports) Ports.Add(ctx.Connection.RemotePort); return "pong"; }));
+
     internal static readonly WebRig Rig = WebRig.Start(app =>
-    {
-        app.MapGet("/downstream", (HttpContext ctx) => { lock (Ports) Ports.Add(ctx.Connection.RemotePort); return "pong"; });
         app.MapGet("/api/{id:int}", async (int id, IHttpClientFactory factory) =>
         {
             var client = factory.CreateClient();                                   // pooled, lifetime-managed handlers
-            return await client.GetStringAsync(Workload.Rig.BaseUrl + "/downstream");
-        });
-    },
+            return await client.GetStringAsync(Downstream.BaseUrl + "/downstream");
+        }),
     b => b.Services.AddHttpClient());
 
     public static void Reset() { lock (Ports) Ports.Clear(); }   // scaffolding
