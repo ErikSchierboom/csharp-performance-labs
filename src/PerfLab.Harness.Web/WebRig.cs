@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 namespace PerfLab.Harness.Web;
 
 /// <summary>
-/// An in-process ASP.NET Core server on loopback plus a load driver, for the ASP.NET Core levels (Levels 9–14).
+/// An in-process ASP.NET Core server on loopback plus a load driver, for the ASP.NET Core labs (Labs 9–14).
 /// Each exercise's workload starts a rig once (like other exercises' input data), and each <c>Run()</c> drives a
 /// burst of requests at it. Latencies are fed to <see cref="Lab.RecordLatency"/>, so p99 budgets work.
 ///

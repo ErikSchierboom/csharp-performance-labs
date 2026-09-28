@@ -82,23 +82,23 @@ dotnet-gcdump collect -p <pid>                       # heap graph; open in VS/Pe
 dotnet-dump collect -p <pid>; dotnet-dump analyze <file>   # then: dumpheap -stat, gcroot <addr>, threads, clrstack
 ```
 
-> **Counter names changed in .NET 9.** On a .NET 9+ runtime `dotnet-counters` reports `System.Runtime` metrics as `dotnet.*` names (e.g. `dotnet.thread_pool.queue.length`, `dotnet.gc.collections`, `dotnet.monitor.lock_contentions`); the names below are the .NET ≤ 8 ones. Mapping table: [levels/L08-production/README.md](../levels/L08-production/README.md).
+> **Counter names changed in .NET 9.** On a .NET 9+ runtime `dotnet-counters` reports `System.Runtime` metrics as `dotnet.*` names (e.g. `dotnet.thread_pool.queue.length`, `dotnet.gc.collections`, `dotnet.monitor.lock_contentions`); the names below are the .NET ≤ 8 ones. Mapping table: [labs/L08-production/README.md](../labs/L08-production/README.md).
 
 Counters worth knowing by heart: `alloc-rate`, `gc-heap-size`, `gen-0/1/2-gc-count`, `time-in-gc`,
 `exception-count`, `threadpool-queue-length`, `threadpool-thread-count`, `monitor-lock-contention-count`.
 
 ## Testing a hypothesis
 
-The exercise harness answers *"is it fast enough, and still correct?"*. From Level 6 on, that's not enough - you also need to answer *"why is A faster than B?"*, ideally without just trusting your gut. Three tools, cheapest first.
+The exercise harness answers *"is it fast enough, and still correct?"*. From Lab 6 on, that's not enough - you also need to answer *"why is A faster than B?"*, ideally without just trusting your gut. Three tools, cheapest first.
 
 ### 1. `perf stat`: hardware counters on Linux
 BenchmarkDotNet's `[HardwareCounters]` is Windows-only (per its docs), so on Linux use `perf`.
 ```bash
 sudo dnf install perf                       # Fedora; other distros: linux-tools / perf
 # perf may need:  sudo sysctl kernel.perf_event_paranoid=1   (or run with sudo)
-dotnet build -c Release levels/L06-hardware-runtime/exercises/L06-01-matrix-walk
+dotnet build -c Release labs/L06-hardware-runtime/exercises/L06-01-matrix-walk
 perf stat -e cycles,instructions,cache-references,cache-misses,branches,branch-misses \
-  dotnet levels/L06-hardware-runtime/exercises/L06-01-matrix-walk/bin/Release/net10.0/L06-01-matrix-walk.dll --profile --seconds 5
+  dotnet labs/L06-hardware-runtime/exercises/L06-01-matrix-walk/bin/Release/net10.0/L06-01-matrix-walk.dll --profile --seconds 5
 ```
 Read: **IPC** (instructions / cycles: low means stalls), **cache-miss rate**, **branch-miss rate**. Compare the exercise and the solution with the same `--seconds`.
 Not every counter is available in VMs/containers; if you see `<not supported>`, that hardware event isn't exposed there.
@@ -106,7 +106,7 @@ Not every counter is available in VMs/containers; if you see `<not supported>`, 
 ### 2. JIT disassembly: what code did you actually get?
 ```bash
 DOTNET_JitDisasm="Run" DOTNET_JitStdOutFile=/tmp/run.asm \
-  dotnet levels/L06-hardware-runtime/exercises/L06-05-transform-batch/bin/Release/net10.0/L06-05-transform-batch.dll
+  dotnet labs/L06-hardware-runtime/exercises/L06-05-transform-batch/bin/Release/net10.0/L06-05-transform-batch.dll
 ```
 `DOTNET_JitDisasm` accepts method names/patterns (`Workload:Run`, `*Score*`). It prints the code for **each tier** a method is compiled at; look at the last (Tier-1) one.
 It only shows methods *the JIT compiles*. If your code calls into the framework (`span.Count`, `IndexOf`, `Sum`), the interesting loop is in the framework method, so ask for that name (`SpanHelpers:*`, `*CountValueType*`). Framework methods start out as precompiled ReadyToRun code and only show up once they've been called often enough to be recompiled. If nothing appears, run in `--profile` mode or set `DOTNET_ReadyToRun=0`.
@@ -155,7 +155,7 @@ Further reading: Akinshin, *Pro .NET Benchmarking* [[4]](./READING-LIST.md#ref4)
 
 ## Load, capacity and measurement rigor
 
-The ASP.NET levels (9-14) measure a service under concurrent load, and a few ideas from queueing theory explain most of what you'll see there. They also explain why a load test can mislead you.
+The ASP.NET labs (9-14) measure a service under concurrent load, and a few ideas from queueing theory explain most of what you'll see there. They also explain why a load test can mislead you.
 
 ### Little's law and utilisation
 - **Little's law:** `in-flight requests = throughput x average latency`. A service handling 200 req/s at 50 ms average latency has about 10 requests in flight. If latency doubles at the same throughput, twice as many are in flight, and that is where the thread-pool queue, the connection pool and memory grow.

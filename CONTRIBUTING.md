@@ -5,13 +5,13 @@ Everything else in this repo is written for someone *solving* an exercise. This 
 ## Adding a new exercise
 
 ### Naming
-`L<level>-<NN>-<slug>` (e.g. `L02-07-route-stats`). A level's final boss is `L<level>-boss-<slug>` instead of a number. Level 8 is the exception: its labs are compiled "mystery services" (`L08-01-triage`, …), not exercises; see [levels/L08-production/README.md](levels/L08-production/README.md) if you're adding one of those instead.
+`L<lab>-<NN>-<slug>` (e.g. `L02-07-route-stats`). A lab's final boss is `L<lab>-boss-<slug>` instead of a number. Lab 8 is the exception: its exercises are compiled "mystery services" (`L08-01-triage`, …), not exercises; see [labs/L08-production/README.md](labs/L08-production/README.md) if you're adding one of those instead.
 
 ### Required files
 Every exercise is a matched pair of projects:
 
 ```
-levels/<level>/exercises/<id>/
+labs/<lab>/exercises/<id>/
     README.md        symptom + budgets table, NOT the diagnosis (and no extra credit: it names the fix, so it goes in SOLUTION.md). See any existing exercise for the shape.
     HINTS.md          progressive hints, one <details> block per hint, cheapest tool first.
     Workload.cs       the deliberately slow/broken implementation.
@@ -19,7 +19,7 @@ levels/<level>/exercises/<id>/
     <id>.csproj       OutputType Exe, ProjectReference to src/PerfLab.Harness/PerfLab.Harness.csproj.
     Properties/launchSettings.json   'Measure' (no args, first so plain `dotnet run` measures) and 'Profile' (`--profile --seconds 15`) profiles; copy from any existing exercise. A launch profile cannot select a build configuration, so don't try to encode Release in it.
 
-levels/<level>/solutions/<id>/
+labs/<lab>/solutions/<id>/
     SOLUTION.md       what the profile shows, root cause, the fix, "extra credit" and "go further" questions, further reading.
     Workload.cs       the fixed implementation, same public surface, same checksum as the exercise.
     Properties/launchSettings.json   same as the exercise's.
@@ -33,7 +33,7 @@ The `<Compile Include>` link is what guarantees the exercise and its solution ar
 `Program.cs` constructs a `LabSpec`, see [`src/PerfLab.Harness/Lab.cs`](src/PerfLab.Harness/Lab.cs) for what every field means (it's fully XML-documented). In short:
 - **`ExpectedChecksum`**: run the *fixed* `Workload.cs`, read the value it returns, paste it in. Both the exercise and the solution must produce the same checksum: that's what "you kept the output correct" means.
 - **`MaxMetrics[Metrics.Time]`**: don't just paste in the number you measured, your machine almost certainly isn't the reference machine, so a raw measurement bakes in your machine's skew for everyone else who runs the gate (see README.md's "The harness" section for what the scaling actually does):
-  1. Run any already-built exercise once, e.g. `dotnet run -c Release --project levels/L01-hot-spots/exercises/L01-01-invoice-export`, and read the printed `Machine factor X.XXx vs. reference` line. The spin loop it's timing is workload-independent, so any exercise gives the same factor.
+  1. Run any already-built exercise once, e.g. `dotnet run -c Release --project labs/L01-hot-spots/exercises/L01-01-invoice-export`, and read the printed `Machine factor X.XXx vs. reference` line. The spin loop it's timing is workload-independent, so any exercise gives the same factor.
   2. Run your new solution and read its raw **median time** from the run table, not the "budget" line, that one's already scaled.
   3. Divide: `reference_ms = raw_median_ms / factor`. That's the number to write into `MaxMetrics[Metrics.Time]`.
   4. Add headroom on top.
@@ -48,13 +48,13 @@ The slow (exercise) version must **fail** at least one budget; the fixed (soluti
 
 ### Registering the project
 Add a `<Project Path="...">` line to the right `<Folder>` in **both** solution files:
-- `PerfLab.slnx` → path under `levels/<level>/exercises/<id>/<id>.csproj`
-- `PerfLab.Solutions.slnx` → path under `levels/<level>/solutions/<id>/<id>.csproj`
+- `PerfLab.slnx` → path under `labs/<lab>/exercises/<id>/<id>.csproj`
+- `PerfLab.Solutions.slnx` → path under `labs/<lab>/solutions/<id>/<id>.csproj`
 
-Then add a row for it to that level's `levels/<level>/README.md` exercise table.
+Then add a row for it to that lab's `labs/<lab>/README.md` exercise table.
 
 ### Style
-The existing exercises share a voice: the symptom is described in terms of what you'd *observe*, never what's wrong with the code; `README.md` never uses the word "bug"; hints escalate from "which tool" to "which line" without ever just stating the fix. Read two or three existing exercises in the target level before writing a new one; matching that voice matters more than matching any template mechanically.
+The existing exercises share a voice: the symptom is described in terms of what you'd *observe*, never what's wrong with the code; `README.md` never uses the word "bug"; hints escalate from "which tool" to "which line" without ever just stating the fix. Read two or three existing exercises in the target lab before writing a new one; matching that voice matters more than matching any template mechanically.
 
 ## Validating your change
 ```powershell
@@ -63,7 +63,7 @@ The existing exercises share a voice: the symptom is described in terms of what 
 Requires [PowerShell 7+](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) (`pwsh`), which runs the same on Windows, Linux and macOS; no bash/WSL needed.
 Builds both `.slnx` solutions in Release, then for every exercise/solution pair runs it and checks: every solution exits `0` (pass), every exercise exits `1` or `2` (fails its own budgets: a slow version that accidentally passes is the one thing this script exists to catch). A mismatch prints `SURPRISE` and the script exits non-zero.
 
-This is also what [.github/workflows/perf-gate.yml](.github/workflows/perf-gate.yml) runs in CI on PRs touching `src/**`, `levels/**`, `solutions/**`, or `Directory.Build.props`.
+This is also what [.github/workflows/perf-gate.yml](.github/workflows/perf-gate.yml) runs in CI on PRs touching `src/**`, `labs/**`, `solutions/**`, or `Directory.Build.props`.
 
 ## Other changes
 - **Docs** (`README.md`, `ROADMAP.md`, `docs/`, `templates/`): built with MkDocs. `./scripts/build-docs.ps1` (or `-Serve` for local preview) builds under `--strict`, which fails on broken internal links; run it before opening a PR that touches markdown.

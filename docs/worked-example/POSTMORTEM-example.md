@@ -1,6 +1,6 @@
 # Post-mortem
 
-You won't write one of these until Level 7, but here is the template completed for a small, real-shaped incident, so the format is familiar.
+You won't write one of these until Lab 7, but here is the template completed for a small, real-shaped incident, so the format is familiar.
 (Fictional service; the defect is the one from L00-01.)
 
 ## Feed page slow for power users, 2026-09-20

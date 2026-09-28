@@ -7,7 +7,7 @@ namespace PerfLab.Harness.Data;
 
 /// <summary>
 /// Counts SQL commands (queries and non-queries) executed through EF Core, for the data-access exercises
-/// (Level 5, Level 11+). Register once per <c>DbContextOptionsBuilder</c> via <c>.AddInterceptors(new CommandCounter())</c>.
+/// (Lab 5, Lab 11+). Register once per <c>DbContextOptionsBuilder</c> via <c>.AddInterceptors(new CommandCounter())</c>.
 ///
 /// Two independent views onto the same events, because different exercises want different things:
 /// <list type="bullet">

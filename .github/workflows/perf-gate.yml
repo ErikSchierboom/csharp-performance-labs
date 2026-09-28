@@ -1,7 +1,7 @@
 name: perf-gate
 on:
   pull_request:
-    paths: ['src/**', 'solutions/**', 'levels/**', 'Directory.Build.props']
+    paths: ['src/**', 'solutions/**', 'labs/**', 'Directory.Build.props']
 jobs:
   gate:
     runs-on: ubuntu-latest        # noisy shared runner: expect flaky time budgets; prefer a self-hosted runner for real gates
@@ -9,7 +9,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with: { dotnet-version: '10.0.x' }
-      - name: Perf gate (Level 2 only, as an example)
+      - name: Perf gate (Lab 2 only, as an example)
         shell: pwsh
         run: ./scripts/perf-gate.ps1 L02
         env:

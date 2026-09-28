@@ -28,8 +28,8 @@ namespace PerfLab.Harness;
 /// needed: <see cref="Metrics.Time"/> (wall-clock time), <see cref="Metrics.Alloc"/> (bytes allocated, MB - never
 /// scaled: allocation budgets are absolute and deterministic), <see cref="Metrics.P99"/> (p99 latency, via
 /// <see cref="Lab.RecordLatency"/>), <see cref="Metrics.Cpu"/> (CPU time across all threads), <see cref="Metrics.Gen2"/>
-/// (full collections per run - Level 2+, LOH-churn problems where total bytes alone doesn't tell the whole story) and
-/// <see cref="Metrics.Retained"/> (memory still reachable after a forced full collection - the leak gate for Level 3;
+/// (full collections per run - Lab 2+, LOH-churn problems where total bytes alone doesn't tell the whole story) and
+/// <see cref="Metrics.Retained"/> (memory still reachable after a forced full collection - the leak gate for Lab 3;
 /// a healthy workload retains ~0 between runs). <see cref="Metrics.Time"/>, <see cref="Metrics.P99"/> and
 /// <see cref="Metrics.Cpu"/> scale with the machine factor; the rest don't. Omit a key entirely to leave that budget
 /// ungated - including <see cref="Metrics.Time"/>/<see cref="Metrics.Alloc"/>: an exercise can be pure exploration
@@ -106,7 +106,7 @@ public static class Lab
     {
         // Warm up by *time* as well as by count. Tiered JIT promotes hot methods to fully optimised code on a
         // background thread after a ~100 ms quiet period, so two quick runs would leave a correct, fast fix still
-        // running its slow tier-0 code in the measured runs. (That is itself a Level 6 topic.)
+        // running its slow tier-0 code in the measured runs. (That is itself a Lab 6 topic.)
         var warmStart = Stopwatch.GetTimestamp();
         var firstMs = 0.0;
         var wrongRuns = 0;

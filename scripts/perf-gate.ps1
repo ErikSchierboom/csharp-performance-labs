@@ -39,7 +39,7 @@ $total = 0
 
 foreach ($kind in @("solutions", "exercises")) {
     $want = if ($kind -eq "exercises") { 1 } else { 0 }
-    $dirs = Get-ChildItem -Path "levels/*/$kind/$Prefix*" -Directory -ErrorAction SilentlyContinue | Sort-Object FullName
+    $dirs = Get-ChildItem -Path "labs/*/$kind/$Prefix*" -Directory -ErrorAction SilentlyContinue | Sort-Object FullName
 
     foreach ($d in $dirs) {
         $programCs = Join-Path $d.FullName "Program.cs"

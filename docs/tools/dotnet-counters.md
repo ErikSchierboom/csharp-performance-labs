@@ -30,7 +30,7 @@ Watch it for 10 to 20 seconds before you decide anything. A single refresh tells
 Several metrics are split by a tag, such as `gc.heap.generation` (`gen0`, `gen1`, `gen2`, `loh`, `poh`). Read the rows under the metric name, not just the first one.
 
 ## Traps
-- **The names changed in .NET 9.** Most blog posts use the old ones (`alloc-rate`, `gc-heap-size`, `threadpool-queue-length`). This lab runs .NET 10, so you get the `dotnet.*` names. The [Level 8 README](../../levels/L08-production/README.md#counter-names-net-8-vs-net-9) has the full mapping, and `--counters EventCounters\System.Runtime` still shows the old ones.
+- **The names changed in .NET 9.** Most blog posts use the old ones (`alloc-rate`, `gc-heap-size`, `threadpool-queue-length`). &
 - **Some values are totals since the process started**, not rates (`total_allocated`, `collections`, `gc.pause.time`). Use `--showDeltas`, or subtract two readings.
 - **The heap size only updates after a GC.** If nothing is collecting, the number doesn't move, even while memory grows.
 

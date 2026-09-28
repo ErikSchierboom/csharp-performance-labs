@@ -23,45 +23,45 @@ public static class Metrics
     /// <summary>Built in: memory still reachable after a forced full GC, relative to just before the run.</summary>
     public const string Retained = "retained";
 
-    /// <summary>Committed memory, MB (Level 7: <c>L07-03-works-on-my-laptop</c>).</summary>
+    /// <summary>Committed memory, MB (Lab 7: <c>L07-03-works-on-my-laptop</c>).</summary>
     public const string CommittedMb = "committedMB";
 
-    /// <summary>Concurrent outbound connections/handles held (Level 5 <c>L05-04-service-calls</c>; Level 12 <c>L12-01-downstream-call</c>, <c>L12-boss-catalog-service</c>; Level 13 <c>L13-01-short-responses</c>).</summary>
+    /// <summary>Concurrent outbound connections/handles held (Lab 5 <c>L05-04-service-calls</c>; Lab 12 <c>L12-01-downstream-call</c>, <c>L12-boss-catalog-service</c>; Lab 13 <c>L13-01-short-responses</c>).</summary>
     public const string Connections = "connections";
 
-    /// <summary>Calls made to a downstream/flaky dependency (Level 12: <c>L12-05-flaky-downstream</c>).</summary>
+    /// <summary>Calls made to a downstream/flaky dependency (Lab 12: <c>L12-05-flaky-downstream</c>).</summary>
     public const string DownstreamCalls = "downstreamCalls";
 
-    /// <summary>Calls made to an external service (Level 14: <c>L14-01-black-friday</c>).</summary>
+    /// <summary>Calls made to an external service (Lab 14: <c>L14-01-black-friday</c>).</summary>
     public const string ExternalCalls = "externalCalls";
 
-    /// <summary>Calls into a value factory (Level 4: <c>L04-04-config-cache</c>).</summary>
+    /// <summary>Calls into a value factory (Lab 4: <c>L04-04-config-cache</c>).</summary>
     public const string FactoryCalls = "factoryCalls";
 
-    /// <summary>Callers that gave up (e.g. a retry budget exhausted) (Level 12: <c>L12-05-flaky-downstream</c>; Level 14: <c>L14-01-black-friday</c>).</summary>
+    /// <summary>Callers that gave up (e.g. a retry budget exhausted) (Lab 12: <c>L12-05-flaky-downstream</c>; Lab 14: <c>L14-01-black-friday</c>).</summary>
     public const string GiveUps = "giveUps";
 
-    /// <summary>Loads performed (e.g. cache misses that fell through to the source) (Level 12: <c>L12-02-popular-items</c>).</summary>
+    /// <summary>Loads performed (e.g. cache misses that fell through to the source) (Lab 12: <c>L12-02-popular-items</c>).</summary>
     public const string Loads = "loads";
 
-    /// <summary>Peak queue depth (Level 4: <c>L04-05-order-pipeline</c>, <c>L04-boss-notification-hub</c>).</summary>
+    /// <summary>Peak queue depth (Lab 4: <c>L04-05-order-pipeline</c>, <c>L04-boss-notification-hub</c>).</summary>
     public const string MaxQueued = "maxQueued";
 
-    /// <summary>Peak managed heap size, MB (Level 4: <c>L04-05-order-pipeline</c>).</summary>
+    /// <summary>Peak managed heap size, MB (Lab 4: <c>L04-05-order-pipeline</c>).</summary>
     public const string PeakHeapMb = "peakHeapMb";
 
-    /// <summary>Peak number of requests in flight at once (Level 10: <c>L10-05-impatient-clients</c>).</summary>
+    /// <summary>Peak number of requests in flight at once (Lab 10: <c>L10-05-impatient-clients</c>).</summary>
     public const string PeakInFlight = "peakInFlight";
 
-    /// <summary>Peak number of background jobs outstanding (Level 10: <c>L10-06-background-jobs</c>).</summary>
+    /// <summary>Peak number of background jobs outstanding (Lab 10: <c>L10-06-background-jobs</c>).</summary>
     public const string PeakJobs = "peakJobs";
 
-    /// <summary>Private (non-shareable) memory, MB (Level 7: <c>L07-02-phantom-leak</c>).</summary>
+    /// <summary>Private (non-shareable) memory, MB (Lab 7: <c>L07-02-phantom-leak</c>).</summary>
     public const string PrivateMb = "privateMB";
 
-    /// <summary>Work steps that ran after the client had already given up (Level 10: <c>L10-05-impatient-clients</c>).</summary>
+    /// <summary>Work steps that ran after the client had already given up (Lab 10: <c>L10-05-impatient-clients</c>).</summary>
     public const string StepsAfterAbort = "stepsAfterAbort";
 
-    /// <summary>Process working set, MB (Level 7: <c>L07-03-works-on-my-laptop</c>).</summary>
+    /// <summary>Process working set, MB (Lab 7: <c>L07-03-works-on-my-laptop</c>).</summary>
     public const string WorkingSetMb = "workingSetMB";
 }

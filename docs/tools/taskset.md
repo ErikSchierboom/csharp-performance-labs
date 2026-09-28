@@ -7,14 +7,14 @@
 
 ## Commands
 ```bash
-taskset -c 0-7 dotnet run -c Release --project levels/<level>/exercises/<id>       # cores 0 to 7 only
+taskset -c 0-7 dotnet run -c Release --project labs/<lab>/exercises/<id>       # cores 0 to 7 only
 taskset -c 0,2 dotnet <...>.dll                                                    # two specific cores
 taskset -cp <pid>                                                                  # show a running process's cores
 nproc --all; lscpu --extended                                                      # how many cores, and which are which
 ```
 
 ## When it helps
-- **Noisy numbers.** The web exercises (Level 9 and up) run the server *and* the load generator in one process. Keeping it to a fixed set of cores stops the OS from moving it around, so repeated runs agree better.
+- **Noisy numbers.** The web exercises (Lab 9 and up) run the server *and* the load generator in one process. Keeping it to a fixed set of cores stops the OS from moving it around, so repeated runs agree better.
 - **"Works on my machine."** Your laptop may have 20 cores and production 2. Running on `-c 0,1` shows roughly what a 2-core container sees. The runtime sizes the thread pool and the GC from the cores it's allowed to use.
 - **Hybrid CPUs.** On Intel P-core/E-core chips, `lscpu --extended` shows which core numbers are which (different `MAXMHZ`). Pinning to one type gives much more consistent timings.
 

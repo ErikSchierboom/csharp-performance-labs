@@ -6,7 +6,7 @@
     <LangVersion>latest</LangVersion>
     <InvariantGlobalization>true</InvariantGlobalization>
     <!-- Less noise while profiling: no background GC thread, workstation GC.
-         Later levels change these on purpose. -->
+         Later labs change these on purpose. -->
     <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <Deterministic>true</Deterministic>

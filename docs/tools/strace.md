@@ -12,7 +12,7 @@ sudo apt install strace                                # Ubuntu/Debian
 ## Commands
 ```bash
 # summary table: count and time per system call (-f follows every thread)
-strace -f -c dotnet levels/<level>/exercises/<id>/bin/Release/net10.0/<id>.dll
+strace -f -c dotnet labs/<lab>/exercises/<id>/bin/Release/net10.0/<id>.dll
 
 # only file-related calls
 strace -f -c -e trace=%file,read,write,close dotnet <...>.dll

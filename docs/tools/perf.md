@@ -13,8 +13,8 @@ If `perf` says it has no permission, check `cat /proc/sys/kernel/perf_event_para
 ## Commands
 Build once, then run the `.dll` directly, so you measure the exercise and not the `dotnet run` build step:
 ```bash
-dotnet build -c Release levels/<level>/exercises/<id>
-perf stat -B dotnet levels/<level>/exercises/<id>/bin/Release/net10.0/<id>.dll --profile --seconds 5
+dotnet build -c Release labs/<lab>/exercises/<id>
+perf stat -B dotnet labs/<lab>/exercises/<id>/bin/Release/net10.0/<id>.dll --profile --seconds 5
 ```
 Run the same command for `solutions/<id>` and compare the two.
 

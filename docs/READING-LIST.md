@@ -1,10 +1,10 @@
 # Reading list
 
-Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**: attempt the exercise first, then read. Citations are IEEE-style, numbered continuously; the full list is in [References](#references) at the end.
+Organised by lab, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**: attempt the exercise first, then read. Citations are IEEE-style, numbered continuously; the full list is in [References](#references) at the end.
 
 ## The core shelf
 
-| # | Reference | Why | Level use |
+| # | Reference | Why | Lab use |
 |---|---|---|---|
 | [[1]](#ref1) | Kokosa, Nasarre & Gosse, *Pro .NET Memory Management* | The GC and memory reference. Covers .NET Framework through .NET 8 | 0, 2, 3, 7 |
 | [[2]](#ref2) | Toub, "Performance Improvements in .NET" | The best yearly tour of what the runtime does for you and why | all |
@@ -13,7 +13,7 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 | [[5]](#ref5) | Gregg, *Systems Performance* | Methodology, OS-level tools, Linux focus | 7, 8, 13, 14 |
 | [[6]](#ref6) | Cleary, *Concurrency in C# Cookbook* | Recipes for async, parallel, Channels, dataflow. Written for C# 8, so newer APIs are missing | 4, 10 |
 
-## Level 0: Foundations
+## Lab 0: Foundations
 - [[7]](#ref7), [[8]](#ref8): garbage collection fundamentals and performance.
 - [[1]](#ref1): chapters 1-4 (memory basics, GC generations).
 - [[3]](#ref3): the GC chapter.
@@ -24,14 +24,14 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[108]](#ref108), [[109]](#ref109): the runtime source that decides between a plain `Memmove` and a write-barrier bulk move (why L00-01's hot frame is `BulkMoveWithWriteBarrierBatch`, not `memmove`).
 - [[107]](#ref107): amortised analysis of dynamic arrays, the background to why `List<T>.Insert(0, …)` in a loop is quadratic and `Add` is not (the L00-01 solution's further reading).
 
-## Level 1: Obvious hot spots
+## Lab 1: Obvious hot spots
 - [[12]](#ref12): profiling modes (sampling, tracing, line-by-line, timeline).
 - [[13]](#ref13), [[14]](#ref14): why `[GeneratedRegex]` beats `Compiled` (L01-03).
 - [[15]](#ref15): `TryParse`, the tester-doer pattern (L01-04).
 - [[16]](#ref16): LINQ deferred execution (L01-05).
 - [[17]](#ref17), [[18]](#ref18): on reading a call tree as a picture.
 
-## Level 2: Allocations & GC pressure
+## Lab 2: Allocations & GC pressure
 - [[1]](#ref1): the chapters on allocation, LOH and finalization.
 - [[19]](#ref19): the 85,000-byte threshold (L02-03).
 - [[20]](#ref20): L02-02, L02-06.
@@ -43,15 +43,15 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[28]](#ref28): assert memory traffic in a unit test, the same idea as this repo's `MaxAllocatedMB`.
 - [[29]](#ref29), [[30]](#ref30): Dispose and finalizers (L02-04).
 
-## Level 3: Leaks & retention
+## Lab 3: Leaks & retention
 - [[31]](#ref31), [[32]](#ref32): real leak scenarios with walkthroughs (originally WinDbg-based).
 - [[33]](#ref33): debug a memory leak tutorial.
 - [[1]](#ref1): chapters on GC roots, finalization, weak references.
-- [[34]](#ref34): pinned objects (relevant again at Level 7).
+- [[34]](#ref34): pinned objects (relevant again at Lab 7).
 - [[35]](#ref35): deep dives into the GC and debugging.
 - [[36]](#ref36), [[37]](#ref37): weak references and `ConditionalWeakTable` (L03-05).
 
-## Level 4: Async & concurrency
+## Lab 4: Async & concurrency
 - [[38]](#ref38): long, worth it. Read after L02-05.
 - [[39]](#ref39): debug ThreadPool starvation (L04-01).
 - [[40]](#ref40): how queuing makes starvation worse.
@@ -61,14 +61,14 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[44]](#ref44): old, but the reference on locks and memory models.
 - [[45]](#ref45): `dotnet-counters`.
 
-## Level 5: Library stack under a single caller
+## Lab 5: Library stack under a single caller
 - [[46]](#ref46), [[47]](#ref47): efficient querying, tracking vs. no-tracking (L05-01…03).
 - [[48]](#ref48).
 - [[49]](#ref49): HttpClient guidelines (L05-04).
 - [[50]](#ref50), [[51]](#ref51): JSON source generation, high-performance logging (L05-05, L05-06).
 - [[2]](#ref2): the JSON, logging and I/O sections of the yearly performance posts.
 
-## Level 6: Hardware & runtime effects
+## Lab 6: Hardware & runtime effects
 - [[52]](#ref52): read sections 3 (CPU caches) and 6 (programmer techniques). Old but still the clearest.
 - [[53]](#ref53).
 - [[4]](#ref4): statistics chapters especially.
@@ -80,14 +80,14 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[61]](#ref61): reference only.
 - [[2]](#ref2): the JIT sections of the yearly performance posts (guards, devirtualization, bounds-check elimination).
 
-## Level 7: Boss fights
+## Lab 7: Boss fights
 - [[1]](#ref1): the LOH, pinning, POH and GC-mode chapters.
 - [[62]](#ref62): posts from the GC architect.
 - [[63]](#ref63): garbage collector config settings.
 - [[5]](#ref5): methodology chapter (USE, drill-down, workload characterisation).
 - [[64]](#ref64): stability patterns and failure stories.
 
-## Level 8: Beyond the IDE
+## Lab 8: Beyond the IDE
 - [[65]](#ref65): the map. Then each tool: [[45]](#ref45), [[66]](#ref66), [[67]](#ref67), [[68]](#ref68).
 - [[69]](#ref69), [[70]](#ref70): high CPU usage, containers.
 - [[71]](#ref71): opens `dotnet-trace --format Speedscope` output.
@@ -99,9 +99,9 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 
 ---
 
-## The ASP.NET Core levels (9–14)
+## The ASP.NET Core labs (9–14)
 
-## Level 9: The request pipeline
+## Lab 9: The request pipeline
 - [[77]](#ref77): the "avoid blocking" and "minimize large object allocations" sections match L02-03 and L10.
 - [[78]](#ref78): memory management and patterns in ASP.NET Core.
 - [[79]](#ref79), [[80]](#ref80): ASP.NET Core 8 and 6 performance posts. I did not find a dedicated ASP.NET Core 10 post; check [[81]](#ref81).
@@ -110,14 +110,14 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[85]](#ref85): dependency injection and service-lifetime guidance (L09-04).
 - [[86]](#ref86): see what a maximally tuned pipeline can reach, and treat it as an upper bound, not a target.
 
-## Level 10: Async, threads & the pool under load
+## Lab 10: Async, threads & the pool under load
 - [[41]](#ref41), [[87]](#ref87): async and HttpClient guidance.
 - [[39]](#ref39): note the `WaitHandleWait` event added in .NET 9 for spotting blocked threads.
 - [[40]](#ref40).
 - [[38]](#ref38).
 - [[88]](#ref88): background tasks with hosted services (L10-06).
 
-## Level 11: Data access under load
+## Lab 11: Data access under load
 - [[46]](#ref46), [[47]](#ref47).
 - [[89]](#ref89): DbContext pooling, compiled queries.
 - [[90]](#ref90): chapters on storage/indexes and transactions.
@@ -125,7 +125,7 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[92]](#ref92): Npgsql connection pooling (L11-03).
 - [[93]](#ref93): finding N+1 from traces (L11-01).
 
-## Level 12: Caching & outbound calls
+## Lab 12: Caching & outbound calls
 - [[94]](#ref94), [[95]](#ref95), [[96]](#ref96): HybridCache adds stampede protection over `MemoryCache`.
 - [[97]](#ref97): rate limiting middleware.
 - [[49]](#ref49).
@@ -133,7 +133,7 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[64]](#ref64): timeouts, circuit breakers, bulkheads, back-pressure.
 - [[99]](#ref99): timeouts, retries and backoff with jitter.
 
-## Level 13: Hosting, runtime config & deployment
+## Lab 13: Hosting, runtime config & deployment
 - [[63]](#ref63).
 - [[100]](#ref100): DATAS is on by default from .NET 9; expect different Server-GC memory behaviour after upgrading.
 - [[70]](#ref70).
@@ -141,7 +141,7 @@ Organised by level, matching [ROADMAP.md](../ROADMAP.md). Read **just in time**:
 - [[102]](#ref102), [[103]](#ref103): ReadyToRun, Kestrel.
 - [[5]](#ref5): CPU and cgroup sections.
 
-## Level 14: Production diagnosis & capstones
+## Lab 14: Production diagnosis & capstones
 - [[73]](#ref73) and [[75]](#ref75): SLO chapters.
 - [[104]](#ref104): essential before you trust any load-test percentile.
 - [[5]](#ref5): methodology.

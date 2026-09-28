@@ -1,6 +1,6 @@
 # CLI tools
 
-Short guides to the command-line tools this lab uses: what each one answers, the commands you'll actually type, and how to read what comes back. They're free, they work without an IDE, and most of them work on any OS. You'll need them in Level 8, and they're a good second opinion in every other level.
+Short guides to the command-line tools this lab uses: what each one answers, the commands you'll actually type, and how to read what comes back. They're free, they work without an IDE, and most of them work on any OS. You'll need them in Lab 8, and they're a good second opinion in every other lab.
 
 For *which kind* of measurement a symptom needs (sampling, tracing, snapshots, ...), start with the [profiling guide](../PROFILING-GUIDE.md). These pages are the "how do I type it" companion.
 
@@ -32,7 +32,7 @@ All of these tools attach to a **running process**, and a normal exercise run is
 
 ```bash
 # terminal 1: keep the exercise busy for a minute
-dotnet run -c Release --project levels/<level>/exercises/<id> -- --profile --seconds 60
+dotnet run -c Release --project labs/<lab>/exercises/<id> -- --profile --seconds 60
 
 # terminal 2: attach by name (the exercise id)...
 dotnet-counters monitor -n <id>
@@ -43,5 +43,5 @@ dotnet-counters monitor -p <pid>
 
 - **Every .NET tool here takes `-n <name>` or `-p <pid>`.** The name is the exercise id (`L1-01-invoice-export`) when you start it with `dotnet run`. If you start the `.dll` with `dotnet <file>.dll`, the process is called `dotnet`, so use the pid.
 - `dotnet-counters ps` lists **every** .NET process, IDEs and build servers included. Look for the exercise id in the command-line column.
-- Level 8 labs print their own pid when they start, so you can skip `ps` there.
+- Lab 8 exercises print their own pid when they start, so you can skip `ps` there.
 - The tools only see processes running as the same user. Don't start the exercise with `sudo`.

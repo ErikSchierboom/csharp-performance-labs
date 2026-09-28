@@ -38,7 +38,7 @@ plugins:
   - search
   # Lets a folder's .pages file override MkDocs' default alphabetical nav order,
   # used where alphabetical order would spoil something, e.g. ANSWERS.md sorting
-  # before QUESTIONS.md in the Level 8 labs.
+  # before QUESTIONS.md in the Lab 8 exercises.
   - awesome-pages
 
 # Mermaid is loaded here (Material would otherwise fetch the same file itself) so mermaid-theme.js can add the
