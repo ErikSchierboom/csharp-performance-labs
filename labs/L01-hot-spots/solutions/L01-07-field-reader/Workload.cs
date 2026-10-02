@@ -6,22 +6,15 @@ public static class Workload
 {
     static readonly Item[] Items = Enumerable.Range(0, 2_000_000).Select(i => new Item { Id = i, Price = 1 + i % 50, Qty = i % 7 }).ToArray();
 
-    // Look the column up ONCE, then read it through a fast typed getter (no reflection per item, no boxing).
-    static Func<Item, decimal> Getter(string column) => column switch
+    static long Total(Item[] items)
     {
-        "Price" => x => x.Price,
-        "Qty" => x => x.Qty,
-        "Id" => x => x.Id,
-        _ => throw new ArgumentException(column),
-    };
-
-    static decimal Total(Item[] items, string column)
-    {
-        var get = Getter(column);
         decimal total = 0;
-        foreach (var item in items) total += get(item);
-        return total;
+        foreach (var item in items)
+        {
+            total += item.Id + item.Price + item.Qty;
+        }
+        return (long)total;
     }
 
-    public static long Run() => (long)(Total(Items, "Price") + Total(Items, "Qty") + Total(Items, "Id"));
+    public static long Run() => Total(Items);
 }

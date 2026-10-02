@@ -9,15 +9,12 @@
 Per-item reflection: a property lookup and a boxed, late-bound read for every one of 600,000 reads.
 
 ## Fix
-Resolve the member once per report (here a `switch` returning a typed `Func<Item, decimal>`; in general `Delegate.CreateDelegate`, compiled expression trees, or a source generator) and use the delegate in the loop.
+Directly use the class' properties in a single loop.
 
 ## Take-aways
-1. **Hoist the lookup, keep the read cheap.** Late binding is fine outside hot loops.
-2. Reflection allocates (boxing, argument arrays) as well as burning CPU.
-3. Modern options: source generators / `UnsafeAccessor` (.NET 8+) give reflection-like flexibility with direct-call speed.
-
-## Extra credit
-Cache the `PropertyInfo` but keep calling `GetValue`. How much of the win is the lookup and how much is the invoke?
+1. Reflection allocates (boxing, argument arrays) as well as burning CPU.
+2. Don't overcomplicate; direct member access is much faster than reflection.
+3. Merge the three loops into a single loop.
 
 ## Go further
 Build the getter generically with `Delegate.CreateDelegate` from the `PropertyInfo`. Compare with the `switch` and with compiled expressions.
