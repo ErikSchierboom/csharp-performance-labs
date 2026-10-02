@@ -5,13 +5,12 @@ public record FeedItem(int Id, int Score);
 public static class Feed
 {
     // The feed shows the newest item first. Appending is O(1); inserting at index 0 shifts every element.
-    // So append in arrival order, then reverse once at the end: O(n) instead of O(n^2).
+    // So append in reverse order: O(n) instead of O(n^2).
     public static List<FeedItem> Build(int count)
     {
         var feed = new List<FeedItem>(count);
-        for (int i = 0; i < count; i++)
+        for (int i = count - 1; i >= 0; i--)
             feed.Add(new FeedItem(i, i * 7 % 101));
-        feed.Reverse();
         return feed;
     }
 }

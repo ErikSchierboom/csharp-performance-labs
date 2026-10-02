@@ -14,7 +14,7 @@ Doubling the count roughly quadruples the time.
 **Why the hot frame is not a plain `memmove`.** `FeedItem` is a `record`, a reference type, so the list's array holds GC references. For an array whose element type contains GC references, `Array.Copy` does not use `Memmove`: it calls `Buffer.BulkMoveWithWriteBarrier` so the garbage collector is told about the moved references [[108]](../../../../docs/READING-LIST.md#ref108), [[109]](../../../../docs/READING-LIST.md#ref109). Blocks bigger than 16 KB go through `BulkMoveWithWriteBarrierBatch`, which copies in 16 KB chunks and gives the GC a chance to run between chunks. Each full `Insert` here moves about 480 KB (60,000 references × 8 bytes), so every call takes that path.
 
 ## Fix
-Append (`Add`, O(1) amortised) in arrival order, then `Reverse()` once at the end: O(n) total. Also pre-size the list (`new List<FeedItem>(count)`).
+Append (`Add`, O(1) amortised) in reverse order: O(n) total. Also pre-size the list (`new List<FeedItem>(count)`).
 
 ## Take-aways
 1. **Total cost = cost per call × calls.** Each `Insert` is microseconds and looks harmless; the *count* and the growing size make it quadratic.
