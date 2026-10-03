@@ -2,7 +2,7 @@ namespace SmallSums;
 
 public static class Workload
 {
-    static readonly List<int> Values = Enumerable.Range(0, 24).ToList();
+    static readonly int[] Values = Enumerable.Range(0, 24).ToArray();
 
     // Accept a span: no interface, no enumerator object, works for arrays and lists alike.
     static long Sum(ReadOnlySpan<int> values)
@@ -15,8 +15,7 @@ public static class Workload
     public static long Run()
     {
         long total = 0;
-        var span = System.Runtime.InteropServices.CollectionsMarshal.AsSpan(Values);
-        for (int i = 0; i < 2_000_000; i++) total += Sum(span);
+        for (int i = 0; i < 2_000_000; i++) total += Sum(Values);
         return total;
     }
 }
