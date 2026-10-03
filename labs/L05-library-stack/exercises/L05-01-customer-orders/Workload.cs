@@ -44,13 +44,10 @@ public static class Workload
     {
         CommandCounter.Reset();
         using var ctx = Db.Create();
-        long checksum = 0;
-        var customers = ctx.Customers.ToList();
-        foreach (var c in customers)
-        {
-            var orders = ctx.Orders.Where(o => o.CustomerId == c.Id).ToList();
-            checksum += c.Id * 7L + orders.Sum(o => (long)o.Cents);
-        }
+        var checksum = ctx.Orders
+            .GroupBy(o => o.CustomerId)
+            .Select(g => g.Key * 7L + g.Sum(o => (long)o.Cents))
+            .Sum();
         Lab.Report(DbMetrics.CommandsPerRequest, CommandCounter.Total);
         return checksum;
     }

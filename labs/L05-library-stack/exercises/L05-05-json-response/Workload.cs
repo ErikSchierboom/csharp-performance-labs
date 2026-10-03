@@ -12,6 +12,13 @@ public record OrdersPage(int Page, int PageSize, int Total, List<Order> Items);
 /// <summary>The <c>GET /orders?page=N</c> handler: writes one page of orders to the response body as JSON.</summary>
 public static class OrdersEndpoint
 {
+    private static readonly JsonSerializerOptions JsonSerializerOptions = new()
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Converters = { new JsonStringEnumConverter() },
+    };
+
     public const int PageSize = 50;
 
     public static void Handle(int page, IReadOnlyList<Order> orders, Stream responseBody)
@@ -20,16 +27,9 @@ public static class OrdersEndpoint
         var dto = new OrdersPage(page, PageSize, orders.Count, items);
 
         // Match the API's JSON conventions: camelCase, enums as strings, no nulls.
-        var options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            Converters = { new JsonStringEnumConverter() },
-        };
+        var options = JsonSerializerOptions;
 
-        var json = JsonSerializer.Serialize(dto, options);
-        var bytes = Encoding.UTF8.GetBytes(json);
-        responseBody.Write(bytes, 0, bytes.Length);
+        JsonSerializer.Serialize(responseBody, dto, options);
     }
 }
 

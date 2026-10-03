@@ -43,6 +43,7 @@ public static class LocalServer
 
 public static class Workload
 {
+    private static readonly HttpClient Client = new();
     public static void Reset() => LocalServer.ResetCount();
 
     public static long Run()
@@ -50,8 +51,7 @@ public static class Workload
         long total = 0;
         for (var i = 0; i < 300; i++)
         {
-            using var client = new HttpClient();
-            total += client.GetStringAsync(LocalServer.Url).GetAwaiter().GetResult().Length;
+            total += Client.GetStringAsync(LocalServer.Url).GetAwaiter().GetResult().Length;
         }
         Lab.Report(Metrics.Connections, LocalServer.Connections);
         return total;

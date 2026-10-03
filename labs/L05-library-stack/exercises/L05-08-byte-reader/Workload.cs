@@ -7,10 +7,8 @@ public static class Workload
     public static long Run()
     {
         long sum = 0;
-        using var fs = new FileStream(Path, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 0);
-        int b;
-        while ((b = fs.ReadByte()) != -1) sum += b;
-        return sum;
+        var bytes = File.ReadAllBytes(Path);
+        return bytes.Sum(b => (long)b);
     }
 
     static string MakeFile()

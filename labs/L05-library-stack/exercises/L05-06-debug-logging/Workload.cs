@@ -13,10 +13,16 @@ public static class Workload
         long handled = 0;
         for (var i = 0; i < 300_000; i++)
         {
-            var customer = Customers[i % 100];
-            Log.LogDebug($"Processing order {i} for {customer} at {DateTime.UtcNow.Ticks}");
+            Messages.Processing(Log, i, Customers[i % 100], DateTime.UtcNow.Ticks);
             handled += i % 7;
         }
         return handled;
     }
+}
+
+public static partial class Messages
+{
+    // Source-generated: checks IsEnabled first and formats nothing (allocates nothing) when the level is off.
+    [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = "Processing order {OrderId} for {Customer} at {Ticks}")]
+    public static partial void Processing(ILogger logger, int orderId, string customer, long ticks);
 }
