@@ -10,11 +10,12 @@ Parsing by cutting a string into new strings. `Split` allocates an array plus a 
 the LINQ chain allocates iterators, and its lambda captures `disabledFlags`, so it also allocates a closure and delegates on every call. Per line that's about 530 bytes for one small struct result.
 
 ## Fix
-Slice, don't copy. Parse over `ReadOnlySpan<char>` with `IndexOf` and slicing, compare with `Equals(..., StringComparison.OrdinalIgnoreCase)` instead of lowercasing first, and use `int.Parse`/`decimal.Parse` overloads that take spans.
+Slice, don't copy. Convert the line `string` to a `ReadOnlySpan<char>` and use `Split()` to iterate over the parts.
+Use the `int.TryParse`/`decimal.TryParse`/`Enum.TryParse<T>` overloads that take a `ReadOnlySpan<char>` and use the `ignoreCase: true` parameter to prevent lowercasing and trimming first.
 Hoist the disabled-flags set out of the per-line path: turn it into a `LineFlags` mask **once** and apply it with `flags &= ~disabled`.
 
 ## Take-aways
-1. **Zero allocation is achievable for parsing** when the result is a struct and you never need the intermediate strings.
+1. **Zero allocation is achievable for parsing** when the result is a struct, and you never need the intermediate strings.
 2. Two different classes of fix here: *don't copy* (spans) and *don't rebuild what doesn't change* (the mask, computed once, not per line).
 3. `static` lambdas (`static x => ...`) make the compiler refuse captures, which is a cheap way to keep closure allocations out of hot code.
 4. The span version is longer and harder to read. Spend that complexity only where the profiler says the parse is hot.

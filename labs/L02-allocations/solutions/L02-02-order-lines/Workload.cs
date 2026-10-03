@@ -11,55 +11,43 @@ public readonly record struct OrderLine(int Id, Region Region, int Quantity, dec
 
 public static class LineParser
 {
-    /// <summary>Parses "id;region;qty;price;flag|flag|..." without allocating: slice the line, don't copy it.</summary>
-    public static OrderLine? Parse(ReadOnlySpan<char> line, LineFlags disabled)
+    /// <summary>Parses "id;region;qty;price;flag|flag|..." e.g. "10423; eu ;17;19.99;Gift|FRAGILE".</summary>
+    public static OrderLine? Parse(string line, LineFlags disabledFlags)
     {
-        // Five ';'-separated fields.
-        if (!Next(ref line, ';', out var idText)) return null;
-        if (!Next(ref line, ';', out var regionText)) return null;
-        if (!Next(ref line, ';', out var qtyText)) return null;
-        if (!Next(ref line, ';', out var priceText)) return null;
-        var flagsText = line;                                  // the rest of the line
-        if (flagsText.Contains(';')) return null;              // a 6th field: malformed, like Split(';').Length != 5
+        var lineSpan = line.AsSpan();
+        var parts = lineSpan.Split(';');
 
+        if (!parts.MoveNext()) return null;
+        if (!int.TryParse(lineSpan[parts.Current], CultureInfo.InvariantCulture, out var id))
+            return null;
+
+        if (!parts.MoveNext()) return null;
+        if (!Enum.TryParse<Region>(lineSpan[parts.Current], ignoreCase: true, out var region))
+            region = Region.Other;
+
+        if (!parts.MoveNext()) return null;
+        if (!int.TryParse(lineSpan[parts.Current], CultureInfo.InvariantCulture, out var quantity))
+            return null;
+
+        if (!parts.MoveNext()) return null;
+        if (!decimal.TryParse(lineSpan[parts.Current], CultureInfo.InvariantCulture, out var unitPrice))
+            return null;
+
+        if (!parts.MoveNext()) return null;
         var flags = LineFlags.None;
-        while (true)
+        var flagsSpan = lineSpan[parts.Current];
+        var flagParts = flagsSpan.Split('|');
+        while (flagParts.MoveNext())
         {
-            bool more = Next(ref flagsText, '|', out var flagText);
-            if (!more) flagText = flagsText;                   // the last flag has no trailing '|'
-            flags |= ParseFlag(flagText.Trim());
-            if (!more) break;
+            if (!Enum.TryParse<LineFlags>(flagsSpan[flagParts.Current], ignoreCase: true, out var flag))
+                continue;
+
+            flags |= flag;
         }
-        flags &= ~disabled;
+        flags &= ~disabledFlags;
 
-        return new OrderLine(
-            int.Parse(idText, CultureInfo.InvariantCulture),
-            ParseRegion(regionText.Trim()),
-            int.Parse(qtyText, CultureInfo.InvariantCulture),
-            decimal.Parse(priceText, CultureInfo.InvariantCulture),
-            flags);
+        return new OrderLine(id, region, quantity, unitPrice, flags);
     }
-
-    // Splits off the text before the next separator. Returns false (and leaves `rest` alone) if there is none.
-    static bool Next(ref ReadOnlySpan<char> rest, char separator, out ReadOnlySpan<char> field)
-    {
-        int i = rest.IndexOf(separator);
-        if (i < 0) { field = default; return false; }
-        field = rest[..i];
-        rest = rest[(i + 1)..];
-        return true;
-    }
-
-    static Region ParseRegion(ReadOnlySpan<char> s) =>
-        s.Equals("EU", StringComparison.OrdinalIgnoreCase) ? Region.EU :
-        s.Equals("NA", StringComparison.OrdinalIgnoreCase) ? Region.NA :
-        s.Equals("APAC", StringComparison.OrdinalIgnoreCase) ? Region.APAC : Region.Other;
-
-    static LineFlags ParseFlag(ReadOnlySpan<char> s) =>
-        s.Equals("gift", StringComparison.OrdinalIgnoreCase) ? LineFlags.Gift :
-        s.Equals("fragile", StringComparison.OrdinalIgnoreCase) ? LineFlags.Fragile :
-        s.Equals("priority", StringComparison.OrdinalIgnoreCase) ? LineFlags.Priority :
-        s.Equals("hazmat", StringComparison.OrdinalIgnoreCase) ? LineFlags.Hazmat : LineFlags.None;
 }
 
 public static class Workload
