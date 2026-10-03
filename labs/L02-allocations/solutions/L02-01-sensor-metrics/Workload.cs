@@ -4,34 +4,31 @@ public sealed record Summary(long Sum, int Max, int Median, int BucketCount, lon
 
 public static class MetricsAggregator
 {
-    const int BucketWidth = 10;
+    private const int BucketWidth = 10;
 
-    public static Summary Summarise(IEnumerable<int> source)
+    public static Summary Summarise(int[] source)
     {
-        // Generic collections: ints are stored as ints. No boxing, no unboxing, no per-element object.
-        var values = new List<int>();
         var histogram = new Dictionary<int, int>();
+
+        var sum = 0;
+        var max = 0;
 
         foreach (int v in source)
         {
-            values.Add(v);
-            histogram[v / BucketWidth] = histogram.GetValueOrDefault(v / BucketWidth) + 1;
-        }
-
-        long sum = 0;
-        int max = int.MinValue;
-        foreach (int v in values)
-        {
             sum += v;
-            if (v > max) max = v;
+            max = Math.Max(max, v);
+
+            var bucket = v / BucketWidth;
+            if (!histogram.TryAdd(bucket, 1))
+                histogram[bucket]++;
         }
 
-        values.Sort();
-        int median = values[values.Count / 2];
+        var sorted = source.Order().ToArray();
+        var median = sorted[sorted.Length / 2];
 
         long bucketHash = 0;
-        foreach (var (bucket, count) in histogram)
-            bucketHash += bucket * 1_000_003L + count * 7L;
+        foreach (var (key, value) in histogram)
+            bucketHash += key * 1_000_003L + value * 7L;
 
         return new Summary(sum, max, median, histogram.Count, bucketHash);
     }
