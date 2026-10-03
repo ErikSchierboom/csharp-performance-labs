@@ -15,7 +15,7 @@ public static class LineParser
         int sp2 = rest.IndexOf(' ');
         if (sp2 <= 0) return null;
         var level = rest[..sp2];
-        foreach (char c in level) if (c is < 'A' or > 'Z') return null;
+        foreach (char c in level) if (!char.IsAsciiLetterUpper(c)) return null;
         rest = rest[(sp2 + 1)..];
 
         int sep = rest.IndexOf(" - ", StringComparison.Ordinal);
@@ -25,7 +25,7 @@ public static class LineParser
         rest = rest[(sep + 3)..];                                    // what is left is "<msg>[ status=ddd]"
 
         int status = 0;
-        if (rest.Length >= 11 && rest[^11..^3].SequenceEqual(" status=")
+        if (rest.Length >= 11 && rest[^11..^3] is " status="
             && char.IsAsciiDigit(rest[^3]) && char.IsAsciiDigit(rest[^2]) && char.IsAsciiDigit(rest[^1]))
             status = int.Parse(rest[^3..]);
 
